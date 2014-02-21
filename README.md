@@ -1,7 +1,9 @@
 # CAIRS - Continuous Assimilation of Integrating Rain Sensors
 
-[![Build Status](https://travis-ci.org/scheidan/CAIRS.jl.png)](https://travis-ci.org/scheidan/CAIRS.jl)
 
+![rain map](https://raw.github.com/scheidan/CAIRS/master/Images%20for%20Readme/Header.png)
+
+[![Build Status](https://travis-ci.org/scheidan/CAIRS.jl.png)](https://travis-ci.org/scheidan/CAIRS.jl)
 
 _CAIRS_ is a framework to reconstruct rain fields by assimilating
 signals of fundamentally different rain sensors .
@@ -26,8 +28,10 @@ Note, _CAIRS_ is still in development and the interface may change.
 
 # Installation
 
-_CAIRS_ is not a registered Julia package. However, it can be be
-installed easely with `Pkg.clone()`:
+_CAIRS_ is a [Julia](http://julialang.org/) package. The first step is to download and install 
+Julia (http://julialang.org/downloads/).
+
+_CAIRS_ can then be installed easely with the Julia command `Pkg.clone()`:
 
 ```Julia
 Pkg.clone("git://github.com/scheidan/CAIRS.jl.git")
