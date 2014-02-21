@@ -23,7 +23,6 @@ function log_p_gauge(S::Float64, R::Vector)
     -(S-mu)^2.0/(2.0*sigma)
 end
 
-## sensor_gauge = Sensor(log_p_gauge, [Coor(0.0, 0.0, 0.0)]) # no integration
 sensor_gauge = Sensor(log_p_gauge) # no integration
 
 ## -- microwave link
