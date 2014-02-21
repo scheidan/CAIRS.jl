@@ -23,34 +23,33 @@ immutable Coor <: Location
 end
 
 
-## !!! outer constructor does not work on current development version of JULIA!!!
-## see commented code below !!!
+## !!! outer constructor does only work for Julia 0.2.0 but not 0.3 !!!
 
-## outer constructor
-function Coor(x::Real, y::Real, time::Real)
-    Coor(convert(Float64, x),
-         convert(Float64, y),
-         convert(Float64, time))
-end
+## ## outer constructor
+## function Coor(x::Real, y::Real, time::Real)
+##     Coor(convert(Float64, x),
+##          convert(Float64, y),
+##          convert(Float64, time))
+## end
 
-## set time to 0.0 as default
-Coor(x::Real, y::Real) = Coor(x, y, 0.0)
-
-## convert Datetime in milliseconds since REF_TIME
-function Coor(x::Real, y::Real, time::DateTime)
-    time_msec = time - REF_TIME
-    Coor(x, y, time_msec)
-end
-
-## !!! Code for development version !!!
 ## ## set time to 0.0 as default
-## Coor(x, y) = Coor(x, y, 0.0)
+## Coor(x::Real, y::Real) = Coor(x, y, 0.0)
 
 ## ## convert Datetime in milliseconds since REF_TIME
-## function Coor(x, y, time::DateTime)
+## function Coor(x::Real, y::Real, time::DateTime)
 ##     time_msec = time - REF_TIME
 ##     Coor(x, y, time_msec)
 ## end
+
+
+## set time to 0.0 as default
+Coor(x, y) = Coor(x, y, 0.0)
+
+## convert Datetime in milliseconds since REF_TIME
+function Coor(x, y, time::DateTime)
+    time_msec = time - REF_TIME
+    Coor(x, y, time_msec)
+end
 
 
 

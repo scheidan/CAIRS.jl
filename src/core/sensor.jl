@@ -14,7 +14,7 @@ immutable Sensor
     ## must take a signal S and an array of *not transformed* rain
     log_p::Function
 
-    ## 'offset in the coordinates of all [R_1 ,... R_n]
+    ## 'offset' in the coordinates of all [R_1 ,... R_n]
     delta_coor::Vector{Coor}
 
     ## cube of integration, relative to sensor position
@@ -30,6 +30,12 @@ end
 ## constructor assumes no offset if not specified
 function Sensor(log_p::Function, int_domain::Coor)
     Sensor(log_p, Coor[], int_domain)
+end
+
+## constructor assumes no offset and no integration if not specified
+function Sensor(log_p::Function)
+    coor = Coor(0.0, 0.0, 0.0)
+    Sensor(log_p, [coor], coor)
 end
 
 
