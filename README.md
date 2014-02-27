@@ -44,7 +44,7 @@ be updated with `Pkg.update()`.
 # Example
 
 First, the package _CAIRS_ must be loaded. For convinience, it is also
-recommended to load the pacakges `Datetime` and `Distributions`:
+recommended to load the packages `Datetime` and `Distributions`:
 
 ```Julia
 using CAIRS
@@ -56,7 +56,7 @@ using Distributions
 ### Sensor definition
 
 Every sensor must be defined. In the simplest case a sensor measures
-the rain intensity at a point. Then only (the logarithm of) the signal
+the rain intensity at a point. Then simply (the logarithm of) the signal
 distribution must be defined:
 
 ```Julia
