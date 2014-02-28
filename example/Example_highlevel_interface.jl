@@ -9,6 +9,7 @@
 
 using CAIRS
 using Datetime
+using Distributions
 
 ## ---------------------------------
 ## Define sensors
@@ -19,8 +20,8 @@ function log_p_gauge(S::Float64, R::Vector)
     mu = 0.1+R[1]^2.0
     sigma = 0.005
 
-    ## log of normal density
-    -(S-mu)^2.0/(2.0*sigma)
+    ## log of normal density, p(S|R)
+    logpdf(Normal(mu, sigma), S)
 end
 
 sensor_gauge = Sensor(log_p_gauge) # no integration
@@ -31,8 +32,8 @@ function log_p_MWL(S::Float64, I::Float64)
     R_mean = I/6.0
     sigma = 0.005
 
-    ## log of normal density
-    -(S-R_mean)^2.0/(2.0*sigma)
+    ## log of normal density, p(S|I)
+    logpdf(Normal(R_mean, sigma), S)
 end
 
 sensor_MWL = Sensor(log_p_MWL, Coor(6, 0, 0)) # integrates along a path of length 6

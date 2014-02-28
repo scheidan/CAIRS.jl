@@ -28,7 +28,7 @@ Note, _CAIRS_ is still in development and the interface may change.
 
 # Installation
 
-_CAIRS_ is a [Julia](http://julialang.org/) package. The first step is to download and install 
+_CAIRS_ is a [Julia](http://julialang.org/) package. The first step is to download and install
 Julia (http://julialang.org/downloads/).
 
 _CAIRS_ can then be installed easely with the Julia command `Pkg.clone()`:
@@ -43,29 +43,31 @@ be updated with `Pkg.update()`.
 
 # Example
 
-First, the package _CAIRS_ must be loaded. For convinience, is it
-recommended to load `Datetime` too:
+First, the package _CAIRS_ must be loaded. For convinience, it is also
+recommended to load the packages `Datetime` and `Distributions`:
 
 ```Julia
 using CAIRS
 using Datetime
+using Distributions
 ```
 
 
 ### Sensor definition
 
-Every sensor must be defined. in the simplest case a sensor measures
-the rain intensity at a point. Then only (the logarithm of) the signal
+Every sensor must be defined. In the simplest case a sensor measures
+the rain intensity at a point. Then simply (the logarithm of) the signal
 distribution must be defined:
 
 ```Julia
 function log_p_gauge(S::Float64, R::Vector) # non-linear continuous rain gauge
 
-    mu = 0.1+R[1]^2.0
+    mu = 0.1+R[1]^2.0    # Note, the signal and can be non-linearly
+                         # related to the rain intensity.
     sigma = 0.005
 
-    ## log of normal density
-    -(S-mu)^2.0/(2.0*sigma)
+     ## log of normal density, p(S|R)
+    logpdf(Normal(mu, sigma), S)   # doesn't have to be normal
 end
 
 sensor_gauge = Sensor(log_p_gauge)
@@ -81,8 +83,8 @@ function log_p_MWL(S::Float64, I::Float64)
     R_mean = I/6.0
     sigma = 0.1
 
-    ## log of normal density
-    -(S-R_mean)^2.0/(2.0*sigma)
+    ## log of normal density, p(S|I)
+    logpdf(Normal(R_mean, sigma), S)
 end
 
 sensor_MWL = Sensor(log_p_MWL, Coor(6, 0, 0)) # integrates along a path of length 6
@@ -149,7 +151,7 @@ R_pred = predict(loc_pred,               # vector or array with locations for pr
                  n_sample_calib = 20000, # number of iterations of the Gibbs sampler
                  burn_in = 5000,         # number of removed samples (and length of adaptation)
                  n_sample_pred = 6000,   # number of samples for predictions
-                 delta = 90*1000)        # consider all signals that are not further away than 
+                 delta = 90*1000)        # consider all signals that are not further away than
                                          # time 'delta' from prediction points [ms]
 ```
 
