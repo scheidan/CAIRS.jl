@@ -41,7 +41,7 @@ function make_signal_dict{T<:Signal}(signals::Vector{T})
             for delta_coor in S.sensor.delta_coor
                 push!(coors, S.position + delta_coor)
             end
-        
+
             ## add all coors to Dict
             for i in 1:size(coors, 1)
                 ## if coors[i] is already a key in Dic
@@ -53,7 +53,7 @@ function make_signal_dict{T<:Signal}(signals::Vector{T})
                 end
             end
         end
-        
+
     end
     return(Dic)
 
@@ -108,11 +108,11 @@ function log_p_of_signal(S::Signal, sample_dict::Dict{Location, Vector{Float64}}
 
 
     ## get value of integrated Domain
-    if S.sensor.domain_extent != Coor(0.0, 0.0, 0.0)       
+    if S.sensor.domain_extent != Coor(0.0, 0.0, 0.0)
         domain = Domain(S.position, S.sensor.domain_extent, S.angle)
         I = sample_dict[domain][i_sample]
     end
-    
+
     ## compute log_p
     if S.sensor.domain_extent == Coor(0.0, 0.0, 0.0) # no domain
         log_p = S.sensor.log_p(S.signal, R)
@@ -159,11 +159,11 @@ function Gibbs{T<:Signal}(signals::Vector{T}, n_samples::Integer, burn_in::Integ
 
     ## Compute mean
     mu = [f_mu(loc) for loc in samp_points]
-    
+
     ## compute inverse covariance matrix
     Sigma = make_cov(samp_points, samp_points, f_cov)
     Sigma_inv = inv(Sigma)
-   
+
     ## sd of jump distributions
     sd_prior = sqrt(diag(Sigma))
     sd_prop = [collect(keys(samples_dict))[ii] => sd_prior[ii] for ii in 1:length(samples_dict)]
@@ -176,8 +176,8 @@ function Gibbs{T<:Signal}(signals::Vector{T}, n_samples::Integer, burn_in::Integ
         mod(i, 5000)==0 ? println("iteration $i of $n_samples") : nothing
 
         ## loop over all all point rains
-        for location in keys(samples_dict)          
-            
+        for location in keys(samples_dict)
+
             ## find all signals that condition on 'location'
             signals = signal_dict[location]
 
@@ -198,7 +198,7 @@ function Gibbs{T<:Signal}(signals::Vector{T}, n_samples::Integer, burn_in::Integ
             p_acc = min(1.0, exp(log_p_prop - log_p_old))
 
             ## accept or not
-            if rand() < p_acc
+            if rand() < p_acc[1]
                 samples_dict[location][i+1] = samples_dict_prop[location][1]
             else
                 samples_dict[location][i+1] =  samples_dict[location][i]
@@ -215,7 +215,7 @@ function Gibbs{T<:Signal}(signals::Vector{T}, n_samples::Integer, burn_in::Integ
                 else
                     sd_prop[location] = sd_prop[location] / exp(min(0.1, 1/sqrt(i)))
                 end
-                
+
             end
 
         end
