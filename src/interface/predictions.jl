@@ -18,7 +18,7 @@
 ## delta:          maximal time distance of signals to prediction location in Milli seconds
 
 
-function predict{T<:Location}(loc_pred::Array{T}, signals::Vector{Signal};
+function predict{T1<:Location, T2<:Signal}(loc_pred::Array{T1}, signals::Vector{T2};
                  n_sample_calib::Int = 20000, burn_in::Int = -1,
                  n_sample_pred::Int = 5000, delta::Real = -1.0)
 
@@ -37,7 +37,7 @@ function predict{T<:Location}(loc_pred::Array{T}, signals::Vector{Signal};
     println("\n--- calibration ---")
     println(" Consider ", size(sig, 1), " signals")
     Samp_dict_cal = Gibbs(sig, n_sample_calib, burn_in, true)
-    
+
     ## sample predictions
 
     println("\n--- prediction ---")
