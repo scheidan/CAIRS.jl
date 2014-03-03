@@ -12,3 +12,5 @@ script:
   - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("CAIRS"))`); Pkg.pin("CAIRS"); Pkg.resolve()'
   - julia -e 'using CAIRS; @assert isdefined(:CAIRS); @assert typeof(CAIRS) === Module'
   - julia ./test/tests.jl
+  - grep -v Rscript  ./example/Example_highlevel_interface.jl > example_without_R.jl
+  - julia ./example_without_R.jl
