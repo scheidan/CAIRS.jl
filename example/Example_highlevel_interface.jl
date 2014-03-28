@@ -40,6 +40,17 @@ sensor_MWL = Sensor(log_p_MWL, Coor(6, 0, 0)) # integrates along a path of lengt
 
 
 ## ---------------------------------
+## Define prior
+
+mean_GP = mean_constant(mean=2)
+
+cov_GP = cov_exponential(sigma=10.0,         # standard deviation of GP
+                         l_spatial=1.5,      # spatial correlation length
+                         l_temporal=60*1000, # temporal correlation length [milliseconds]
+                         gamma=1.0)          # exponent for smoothness in [0, 2]
+
+
+## ---------------------------------
 ## Import signals from files
 
 ## Signals of every sensor must be in a separate file.
@@ -92,6 +103,8 @@ loc_pred = [Coor(i, j, time)
 
 R_pred = predict(loc_pred,               # vector or array with locations for predictions
                  sig,                    # vector of signals
+                 mean_GP,                # mean function of prior
+                 cov_GP,                 # covariance function of prior
                  n_sample_calib = 20000, # number of iterations of the Gibbs sampler
                  burn_in = 5000,         # number of removed samples (and length of adaptation)
                  n_sample_pred = 6000,   # number of samples for predictions

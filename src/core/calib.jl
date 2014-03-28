@@ -102,7 +102,7 @@ function log_p_of_signal(S::Signal, sample_dict::Dict{Location, Vector{Float64}}
         ## get vector of all intensities
         R = Float64[]
         for c in coors
-            push!(R, trans2real(sample_dict[c][i_sample]))
+            push!(R, sample_dict[c][i_sample])
         end
     end
 
@@ -134,6 +134,8 @@ end
 ##   Computational Statistics and Data Analysis, 18, 349-367.
 ##
 ## signals:      vector of 'Signals'
+## prior_mean:     mean function of Prior, f(c::Coor)
+## prior_cov:      covariance function of Prior, f(c1::Coor, c2::Coor)
 ## n_sample:     number of MCMC sample
 ## burn_in:      number of samples to remove as burn-in
 ## adaption:     true/false
@@ -142,10 +144,16 @@ end
 ##         - adaptive rejection sampling (http://www.stat.duke.edu/~cnk/Links/slides.pdf)?
 ##         - slice sampling?
 
-function Gibbs{T<:Signal}(signals::Vector{T}, n_samples::Integer, burn_in::Integer=0, adaption::Bool=true)
+function Gibbs{T<:Signal}(signals::Vector{T},
+                          prior_mean::Function, prior_cov::Function,
+                          n_samples::Integer, burn_in::Integer=0;
+                          adaption::Bool=true)
 
     ## -----------
     ## 1) set-up
+
+    ## create overlaoded function of Prior
+    f_mu, f_cov = overload_GP_function(prior_mean, prior_cov)
 
     ##  create dictionary of all signals
     signal_dict = make_signal_dict(signals)
@@ -158,7 +166,7 @@ function Gibbs{T<:Signal}(signals::Vector{T}, n_samples::Integer, burn_in::Integ
     samp_points = collect(keys(samples_dict))
 
     ## Compute mean
-    mu = [f_mu(loc) for loc in samp_points]
+    mu = Float64[f_mu(loc) for loc in samp_points]
 
     ## compute inverse covariance matrix
     Sigma = make_cov(samp_points, samp_points, f_cov)

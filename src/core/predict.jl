@@ -12,8 +12,10 @@
 ## loc_pred:    vector with locations (Coor, Domain) for predictions
 ## R_dict_cal:  dictionary containg the samples of calibration
 ## n_samples:   number of samples
+## prior_mean:     mean function of Prior, f(c::Coor)
+## prior_cov:      covariance function of Prior, f(c1::Coor, c2::Coor)
 ## optional arguments:
-## block_size:  number of sample points per block. 
+## block_size:  number of sample points per block.
 ##
 ## Note:
 ## If 'block_size' is small as the number of prediction
@@ -25,9 +27,10 @@
 ##          O(n^3) with n_calib and blocksize
 
 function sample_preditions{T<:Location}(loc_pred::Vector{T},
-                           R_dict_cal::Dict{Location, Vector{Float64}},
-                           n_samples::Integer;
-                           block_size::Real = 200)
+                                        R_dict_cal::Dict{Location, Vector{Float64}},
+                                        n_samples::Integer,
+                                        prior_mean::Function, prior_cov::Function;
+                                        block_size::Real = 200)
 
     ## separate locations that have already been used used for calibration
     loc_pred_cal = filter(x -> in(x, collect(keys(R_dict_cal))),  loc_pred)
@@ -43,7 +46,8 @@ function sample_preditions{T<:Location}(loc_pred::Vector{T},
     ## sample each block
     for i in 1:n_blocks
         index = ((i-1)*block_size+1) : min(i*block_size, size(loc_pred, 1))
-        merge!(R_dict_pred, sample_preditions_block(loc_pred[index], R_dict_cal, n_samples))
+        merge!(R_dict_pred,
+               sample_preditions_block(loc_pred[index], R_dict_cal, n_samples, prior_mean, prior_cov))
     end
 
     ## -----------
@@ -71,19 +75,25 @@ end
 ## loc_pred:  vector with locations for predictions
 ## R_dict_cal:  dictionary containg the samples of calibration
 ## n_samples:   number of samples
+## prior_mean:     mean function of Prior, f(c::Coor)
+## prior_cov:      covariance function of Prior, f(c1::Coor, c2::Coor)
 ##
 ## returns a dictionary
 
 function sample_preditions_block{T<:Location}(loc_pred::Vector{T},
-                                 R_dict_cal::Dict{Location, Vector{Float64}},
-                                 n_samples::Integer)
+                                              R_dict_cal::Dict{Location, Vector{Float64}},
+                                              n_samples::Integer,
+                                              prior_mean::Function, prior_cov::Function)
 
     loc_c = collect(keys(R_dict_cal))       # locations of calib
 
+    ## create overlaoded function of Prior
+    f_mu, f_cov = overload_GP_function(prior_mean, prior_cov)
+
     ## compute means
-    mu_c = [f_mu(loc) for loc in loc_c]
-    mu_p = [f_mu(loc) for loc in loc_pred]
-    
+    mu_c = Float64[f_mu(loc) for loc in loc_c]
+    mu_p = Float64[f_mu(loc) for loc in loc_pred]
+
     ## compute conditional covariance matrix
     Sigma_cc_inv = inv(make_cov(loc_c, loc_c, f_cov))
     Sigma_pp = make_cov(loc_pred, loc_pred, f_cov)

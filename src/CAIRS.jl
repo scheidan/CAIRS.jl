@@ -16,15 +16,18 @@ module CAIRS
 using Cubature
 using Datetime
 
+## -----------
+## Define constantes
+
+const REF_TIME = datetime(1984, 10, 20) # reference point in time. Count milliseconds from this date.
 
 ## -----------
 ## Core functions
 
-include(joinpath("core", "coor.jl"))                      
+include(joinpath("core", "coor.jl"))
 include(joinpath("core", "sensor.jl"))
 include(joinpath("core", "signal.jl"))
-include(joinpath("core", "priorGP.jl"))
-include(joinpath("core", "constantes.jl"))
+include(joinpath("core", "GaussianProcess.jl"))
 include(joinpath("core", "calib.jl"))
 include(joinpath("core", "predict.jl"))
 
@@ -32,8 +35,11 @@ include(joinpath("core", "predict.jl"))
 
 include(joinpath("interface", "helpers.jl")) #  Helper functions (maybe removed later)
 include(joinpath("interface", "signal_handling.jl"))
-include(joinpath("interface", "predictions.jl"))            
+include(joinpath("interface", "predictions.jl"))
 
+
+## Prior
+include(joinpath("prior", "Prior_definition.jl"))
 
 ## -----------
 ## export
@@ -48,6 +54,9 @@ export find_near_signals
 ## interface functions
 export add_signal!, remove_signal!, predict
 export chains2csv, summary2csv, sensor2csv
+
+## prior
+export mean_constant, cov_exponential
 
 ## export so that user can supply DateTime objects
 export DateTime, datetime

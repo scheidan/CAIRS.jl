@@ -90,6 +90,33 @@ end
 sensor_MWL = Sensor(log_p_MWL, Coor(6, 0, 0)) # integrates along a path of length 6
 ```
 
+### Prior definition
+
+The prior of the rain field is modeled as Gaussian process (GP). A GP
+is described by a mean and a covariance function.
+
+This functions can be specified by the user. The mean function returns
+the prior mean of the rain intensity at a given coordinate. It must
+take a single argument of type `Coor`. The covariance function must
+return the covariance of the rain intensity at two given point, given
+by two arguments of type `Coor`. Note, it is not checked if the
+provided function is a valid covariance function!
+
+Helper to construct valid functions are provided. The functions
+`mean_constant()` and `cov_exponential()` create a simple constant
+mean, and a separable gamma-exponential covariance function. Only the
+parameters must be provided:
+
+```Julia
+mean_GP = mean_constant(mean=2)
+
+cov_GP = cov_exponential(sigma=10.0,         # standard deviation of GP
+                         l_spatial=1.5,      # spatial correlation length
+                         l_temporal=60*1000, # temporal correlation length [milliseconds]
+                         gamma=1.0)          # exponent for smoothness in [0, 2]
+```
+Other types of covariance functions will be added in future.
+
 ### Signal import
 
 The next step is to import the signals. Every signal must have an
@@ -148,11 +175,12 @@ The assimilation of the signals and the computation of the predictions are done 
 ```Julia
 R_pred = predict(loc_pred,               # vector or array with locations for predictions
                  sig,                    # vector of signals
+                 mean_GP,                # mean function of prior
+                 cov_GP,                 # covariance function of prior
                  n_sample_calib = 20000, # number of iterations of the Gibbs sampler
                  burn_in = 5000,         # number of removed samples (and length of adaptation)
                  n_sample_pred = 6000,   # number of samples for predictions
-                 delta = 90*1000)        # consider all signals that are not further away than
-                                         # time 'delta' from prediction points [ms]
+                 delta = 90*1000)        # consider all signals within time 'delta' from prediction points [ms]
 ```
 
 Write a summary of the samples in a file that is used for visualization:
@@ -168,7 +196,7 @@ the R-libraries `lattice`, `latticeExtra` and `tripack` are installed.
 pathRscript = joinpath(Pkg.dir("CAIRS"), "R", "compute_rain_map.r")
 run(`Rscript $pathRscript  rain_field.csv sensor_coor.csv out.pdf`)
 ```
-Note, here is is assumed that `Rscript` is in PATH.
+Note, here it is assumed that `Rscript` is in PATH.
 
 
 
