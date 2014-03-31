@@ -9,12 +9,6 @@
 using Base.Test
 using CAIRS
 
-## install packages
-
-Pkg.add("Datetime")
-Pkg.add("Cubature")
-Pkg.add("Distributions")
-
 
 ## Coordinates
 
