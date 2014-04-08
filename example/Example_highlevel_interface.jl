@@ -44,10 +44,10 @@ sensor_MWL = Sensor(log_p_MWL, Coor(6, 0, 0)) # integrates along a path of lengt
 
 mean_GP = mean_constant(mean=2)
 
-cov_GP = cov_exponential(sigma=10.0,         # standard deviation of GP
-                         l_spatial=1.5,      # spatial correlation length
-                         l_temporal=60*1000, # temporal correlation length [milliseconds]
-                         gamma=1.0)          # exponent for smoothness in [0, 2]
+cov_GP = cov_exponential(sigma=10.0,           # standard deviation of GP
+                         l_spatial=1.5,        # spatial correlation length
+                         l_temporal=minute(1), # temporal correlation length
+                         gamma=1.0)           # exponent for smoothness in [0, 2]
 
 
 ## ---------------------------------
@@ -108,7 +108,8 @@ R_pred = predict(loc_pred,               # vector or array with locations for pr
                  n_sample_calib = 20000, # number of iterations of the Gibbs sampler
                  burn_in = 5000,         # number of removed samples (and length of adaptation)
                  n_sample_pred = 6000,   # number of samples for predictions
-                 delta = 90*1000)        # consider all signals within time 'delta' from prediction points [ms]
+                 delta = seconds(90))    # consider all signals within time 'delta'
+                                         #  from prediction points
 
 
 ## compute summary of samples and save in file

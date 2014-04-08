@@ -41,16 +41,22 @@ end
 
 function cov_exponential(;sigma::Real=10.0,       # standard deviation of GP
                          l_spatial::Real=3000.0, # spatial correlation length
-                         l_temporal::Real=600.0*1000, # temporal correlation length [milliseconds]
+                         l_temporal=600.0*1000, # temporal correlation length [milliseconds]
                          gamma::Real=1.0)        # exponent for smoothness in [0, 2]
 
 
     (gamma<0) | (gamma>2) ? error("'gamma' must be in [0, 2]!") : nothing
 
+    ## convert TimePeriod objects in milliseconds
+    if typeof(l_temporal) <: Datetime.TimePeriod
+        temp = l_temporal - second(0)
+        l_temporal = 1000*convert(Real, temp)
+    end
+
     println("- Prior has a separable gamma-exponential covariance function with:")
     println("   standard deviation: $sigma")
     println("   spatial correlation length: $l_spatial")
-    println("   temporal correlation length [ms]: $l_temporal")
+    println("   temporal correlation length [s]: $(l_temporal/1000)")
     println("   gamma: $gamma")
 
 
