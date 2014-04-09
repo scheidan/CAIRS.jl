@@ -3,10 +3,10 @@
 
 ![rain map](https://raw.github.com/scheidan/CAIRS/master/Images%20for%20Readme/Header.png)
 
-[![Build Status](https://travis-ci.org/scheidan/CAIRS.jl.png)](https://travis-ci.org/scheidan/CAIRS.jl)
+[![Build Status](https://travis-ci.org/scheidan/CAIRS.jl.svg)](https://travis-ci.org/scheidan/CAIRS.jl)
 
 _CAIRS_ is a framework to reconstruct rain fields by assimilating
-signals of fundamentally different rain sensors .
+signals of fundamentally different rain sensors.
 
 In particular, the *integration characteristics* of sensors are
 explicitly considered.  For example, non-recording standard rain gauges
@@ -22,16 +22,16 @@ of signals with irregular time-intervals.
 
 For more information see [Scheidegger and Rieckermann (2014)](#publication).
 
-Note, _CAIRS_ is still in development and the interface may change.
+Note, _CAIRS_ is still under development and the interface may change.
 
 
 
 # Installation
 
 _CAIRS_ is a [Julia](http://julialang.org/) package. The first step is to download and install
-Julia (http://julialang.org/downloads/).
+Julia, version >= 0.3 (http://julialang.org/downloads/).
 
-_CAIRS_ can then be installed easely with the Julia command `Pkg.clone()`:
+_CAIRS_ can then be installed with the Julia command `Pkg.clone()`:
 
 ```Julia
 Pkg.clone("git://github.com/scheidan/CAIRS.jl.git")
@@ -55,9 +55,9 @@ using Distributions
 
 ### Sensor definition
 
-Every sensor must be defined. In the simplest case a sensor measures
-the rain intensity at a point. Then simply (the logarithm of) the signal
-distribution must be defined:
+Every sensor must be characterized. In the simplest case a sensor measures
+the rain intensity at a point. Then (the logarithm of) the signal
+distribution must be defined conditioned on the intesity at this coordinate:
 
 ```Julia
 function log_p_gauge(S::Float64, R::Vector) # non-linear continuous rain gauge
@@ -120,7 +120,7 @@ Other types of covariance functions will be added in future.
 ### Signal import
 
 The next step is to import the signals. Every signal must have an
-attached attached sensor. Signals can be constructed with the function
+attached sensor. Signals can be constructed with the function
 `Signal` or more conveniently with `add_signal()`.
 
 Currently `add_signal()' expected that the signals of every sensor are
@@ -149,11 +149,10 @@ add_signal!(sig, path2,
 
 Information about a signal can be printed with `show`, e.g. `show(sig[1])`.
 
-The sensor positions can be written to a file with:
+Writting the sensor positions in a file is useful for plotting:
 ```Julia
 sensor2csv(sig, "sensor_coor.csv")
 ```
-This is useful for plotting.
 
 ### Definition of prediction points
 
@@ -168,7 +167,7 @@ loc_pred = [Coor(i, j, time)
             for i=linspace(0, 10, nn), j=linspace(0, 10, nn),
             time=datetime(2013, 11, 22, 13, 15, 00) : minute(1): datetime(2013, 11, 22, 13, 20, 00) ]
 ```
-This produced a regular grid, but the point could also be irregularly distributed.
+This produced a regular grid, but the point could also be irregularly distributed. Also, not only predictions for coordinates but also for intesities integrated over a domain can be made. Domains are defined by the function `Domain`.
 
 ### Assimilation
 The assimilation of the signals and the computation of the predictions are done with `predict`.
