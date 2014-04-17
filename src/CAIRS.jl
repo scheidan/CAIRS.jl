@@ -56,7 +56,7 @@ export add_signal!, remove_signal!, predict
 export chains2csv, summary2csv, sensor2csv
 
 ## prior
-export mean_constant, cov_exponential
+export mean_constant, cov_exponential, cov_sphere
 
 ## export so that user can supply DateTime objects
 export DateTime, datetime
