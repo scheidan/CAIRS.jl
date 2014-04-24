@@ -1,7 +1,7 @@
 ## =======================================================
 ## Continuous Assimilation of Integrating Rain Sensors (CAIRS)
 ##
-## Description: calibration of rainfield
+## Description: calibration of rainfield with Gibbs-sampling
 ##
 ## Andreas Scheidegger -- andreas.scheidegger@eawag.ch
 ## =======================================================
@@ -152,7 +152,7 @@ function Gibbs{T<:Signal}(signals::Vector{T},
     ## -----------
     ## 1) set-up
 
-    ## create overlaoded function of Prior
+    ## create overloaded function of Prior
     f_mu, f_cov = overload_GP_function(prior_mean, prior_cov)
 
     ##  create dictionary of all signals

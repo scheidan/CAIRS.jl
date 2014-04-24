@@ -28,7 +28,8 @@ include(joinpath("core", "coor.jl"))
 include(joinpath("core", "sensor.jl"))
 include(joinpath("core", "signal.jl"))
 include(joinpath("core", "GaussianProcess.jl"))
-include(joinpath("core", "calib.jl"))
+include(joinpath("core", "calib_Gibbs.jl"))
+include(joinpath("core", "calib_HMC.jl"))
 include(joinpath("core", "predict.jl"))
 
 ## High-level interface
