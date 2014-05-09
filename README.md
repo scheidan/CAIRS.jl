@@ -2,9 +2,8 @@
 
 
 ![rain map](https://raw.github.com/scheidan/CAIRS/master/Images%20for%20Readme/Header.png)
-
-[![Build Status](https://travis-ci.org/scheidan/CAIRS.jl.svg)](https://travis-ci.org/scheidan/CAIRS.jl)
-[![Coverage Status](https://img.shields.io/coveralls/scheidan/CAIRS.jl.svg)](https://coveralls.io/r/scheidan/CAIRS.jl?branch=master)
+[![Build Status](https://travis-ci.org/scheidan/CAIRS.jl.svg?branch=HMC)](https://travis-ci.org/scheidan/CAIRS.jl)
+[![Coverage Status](https://img.shields.io/coveralls/scheidan/CAIRS.jl.svg)](https://coveralls.io/r/scheidan/CAIRS.jl?branch=HMC)
 
 *This is an experimental branch to include automatic differencing to Hamiltonian Monte Carlo*
 
