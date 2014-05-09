@@ -4,6 +4,7 @@
 ![rain map](https://raw.github.com/scheidan/CAIRS/master/Images%20for%20Readme/Header.png)
 
 [![Build Status](https://travis-ci.org/scheidan/CAIRS.jl.svg)](https://travis-ci.org/scheidan/CAIRS.jl)
+[![Coverage Status](https://img.shields.io/coveralls/scheidan/CAIRS.jl.svg)](https://coveralls.io/r/scheidan/CAIRS.jl?branch=master)
 
 _CAIRS_ is a framework to reconstruct rain fields by assimilating
 signals of fundamentally different rain sensors.
@@ -12,7 +13,7 @@ In particular, the *integration characteristics* of sensors are
 explicitly considered.  For example, non-recording standard rain gauges
 integrate over time and deliver information such as the daily rainfall
 sums. The rain-induced attenuation of micro wave links (MWL) can be
-used to measure the path-integrated intensities - an example of
+used to measure the path-integrated intensities - an example of a sensor with
 spatial integration.
 
 Sensor signals with different scales (e.g. continuous, binary) can be
@@ -56,7 +57,7 @@ using Distributions
 ### Sensor definition
 
 Every sensor must be characterized. In the simplest case a sensor measures
-the rain intensity at a point. Then (the logarithm of) the signal
+the rain intensity at a point. In this case (the logarithm of) the signal
 distribution must be defined conditioned on the intesity at this coordinate:
 
 ```Julia
@@ -98,11 +99,11 @@ is described by a mean and a covariance function.
 This functions can be specified by the user. The mean function returns
 the prior mean of the rain intensity at a given coordinate. It must
 take a single argument of type `Coor`. The covariance function must
-return the covariance of the rain intensity at two given point, given
+return the covariance of the rain intensities at two given point, given
 by two arguments of type `Coor`. Note, it is not checked if the
 provided function is a valid covariance function!
 
-Helper to construct valid functions are provided. The functions
+However, helpers to construct valid functions are provided. The functions
 `mean_constant()` and `cov_exponential()` create a simple constant
 mean, and a separable gamma-exponential covariance function. Only the
 parameters must be provided:
