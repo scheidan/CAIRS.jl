@@ -36,218 +36,91 @@
 
 
 ## ---------------------------------
-## Generates a dictionary of all signals
-##
-## Assign all signals that are influenced
-## by the intensity to a coordinate or a domain:
-## Domain/Coor => [signal1, Signal3, ...]
+## Prepares MCMC
+## Returns a tuple with:
+## - Discretize integration domain -> coors
+## - Produce a vector with the coordinates where rain intensity will
+##    be sampled -> dic_delta_coor_index
+## - Produce two dictionaries with the indices that point to the right
+##    rain intensities for each signal -> dic_domain_coor_index
 
 ## signals:    vector of Signals
+## n_approx:   number of points per dimension to approximate domains
 
-function make_signal_dict{T<:Signal}(signals::Vector{T})
+function setupMCMC{T<:Signal}(signals::Vector{T}, n_approx::Integer=5)
 
-    ## create empty dictionary
-    Dic = Dict{Coor, Vector{Signal}}()
+    coors = Coor[]                      # array holds all coordinates that are 'measured'
+    dic_delta_coor_index = [S => Integer[] for S in signals]  # Signal => [indices of coors directly measured]
+    dic_domain_coor_index = [S => Integer[] for S in signals]  # Signal => [indices of coors for approx. domains]
 
     ## loop over all Signals
     for S in signals
+        ## -- point measurements
+        coors_delta = [c + S.position for c in S.sensor.delta_coor]
 
-        ## !!! change, not adding a domian but a grid of Coor's !!!
+        ## construct index for direct measurements
+        for coor in coors_delta
+            if in(coor, coors) # Coor is already in coors
+                append!(dic_delta_coor_index[S], findin(coors, [coor])) # add position to index
+            else
+                append!(coors, [coor]) # add coor
+                append!(dic_delta_coor_index[S], [size(coors, 1)] )# add position to index
+            end
+        end
 
-        ## construct integration domain and add to Dict
+        ## -- integrated measurements
+        ## approximate domains with a points
+
         if S.sensor.domain_extent != Coor(0.0, 0.0, 0.0)
-            domain = Domain(S.position, S.sensor.domain_extent, S.angle)
-            ## if 'domain' is already a key in Dic
-            if haskey(Dic, domain)
-                Dic[domain] = unique([S, Dic[domain]])
-                ## if 'domain' is a new key
-            else
-                Dic[domain] = [S]
-            end
-        end
+            ## rotate and shift in right position
+            coors_approx = unique([rotate(Coor(x, y, time), Coor(0.0, 0.0, 0.0), S.angle) + S.position
+                                   for x in linspace(0, S.sensor.domain_extent.x, n_approx),
+                                       y in linspace(0, S.sensor.domain_extent.y, n_approx),
+                                       time in linspace(0, S.sensor.domain_extent.time, n_approx)])
+            coors_approx = reshape(coors_approx, length(coors_approx)) # make vector
 
-        ## construct all coordinated on that S is conditioned
-        if size(S.sensor.delta_coor, 1) > 0
-            coors = Coor[]
-            for delta_coor in S.sensor.delta_coor
-                push!(coors, S.position + delta_coor)
-            end
 
-            ## add all coors to Dict
-            for i in 1:size(coors, 1)
-                ## if coors[i] is already a key in Dic
-                if haskey(Dic, coors[i])
-                    Dic[coors[i]] = unique([S, Dic[coors[i]]])
-                    ## if coors[i] is a new key
+            ## construct index for domains
+            for coor in coors_approx
+                if in(coor, coors) # coor is already in coors
+                    append!(dic_domain_coor_index[S], findin(coors, [coor])) # add position to index
                 else
-                    Dic[coors[i]] = [S]
+                    append!(coors, [coor]) # add Coor
+                    append!(dic_domain_coor_index[S], [size(coors, 1)] )# add position to index
                 end
             end
         end
 
     end
-    return(Dic)
 
+    return(coors, dic_delta_coor_index, dic_domain_coor_index)
 end
 
 
 ## ---------------------------------
-## !!! Change so that sum log_p of all coordinates is computed!!!
-##
-## computes log_p of a signal given a sample point dictionary
+## computes log likelihood of a signals
 
-## S:           a 'Signal' object
-## sample_dict: dictionary of all sample points
-## i_sample:    index of MCMC sample
+## R:        vector with rain intensities corresponding to coors
+## signals:  vector of 'Signal' object
+## dic_delta_coor_index:     dictionaries as created by setupMCMC()
+## dic_domain_coor_index:    dictionaries as created by setupMCMC()
 
-function log_p_of_signal(S::Signal, sample_dict::Dict{Location, Vector{Float64}}, i_sample::Integer)
+function log_likeli{T<:Signal}(R::Vector{Float64}, signals::Vector{T},
+                               dic_delta_coor_index, dic_domain_coor_index)
 
-    ## find all coordinates on that S is conditioned
-    if size(S.sensor.delta_coor,1) > 0
-        coors = Coor[]
-        for delta_coor in S.sensor.delta_coor
-            push!(coors, S.position + delta_coor)
+    ll = 0
+    for S in signals
+
+        if S.sensor.domain_extent == Coor(0.0, 0.0, 0.0) # no domain
+            ll += S.sensor.log_p(S.signal, R[dic_delta_coor_index[S]])
         end
-
-        ## get vector of all intensities
-        R = Float64[]
-        for c in coors
-            push!(R, sample_dict[c][i_sample])
+        if size(S.sensor.delta_coor,1) ==  0 # no coordiantes
+            ll += S.sensor.log_p(S.signal, mean(R[dic_domain_coor_index[S]]))
         end
-    end
-
-
-    ## get value of integrated Domain
-    if S.sensor.domain_extent != Coor(0.0, 0.0, 0.0)
-        domain = Domain(S.position, S.sensor.domain_extent, S.angle)
-        I = sample_dict[domain][i_sample]
-    end
-
-    ## compute log_p
-    if S.sensor.domain_extent == Coor(0.0, 0.0, 0.0) # no domain
-        log_p = S.sensor.log_p(S.signal, R)
-    end
-    if size(S.sensor.delta_coor,1) ==  0 # no coordiantes
-        log_p = S.sensor.log_p(S.signal, I)
-    end
-    if (S.sensor.domain_extent != Coor(0.0, 0.0, 0.0)) && (size(S.sensor.delta_coor,1) > 0)
-        log_p = S.sensor.log_p(S.signal, R, I)
-    end
-    return(log_p)
-end
-
-
-## ---------------------------------
-## Gibbs sampling with adaptive jump distributions
-##
-## Roberts G, Rosenthal J (2009). "Examples of Adaptive MCMC."
-##   Computational Statistics and Data Analysis, 18, 349-367.
-##
-## signals:      vector of 'Signals'
-## prior_mean:     mean function of Prior, f(c::Coor)
-## prior_cov:      covariance function of Prior, f(c1::Coor, c2::Coor)
-## n_sample:     number of MCMC sample
-## burn_in:      number of samples to remove as burn-in
-## adaption:     true/false
-
-## FUTURE: - Ordered Overrelaxation (see MacKay)?
-##         - adaptive rejection sampling (http://www.stat.duke.edu/~cnk/Links/slides.pdf)?
-##         - slice sampling?
-
-function Gibbs{T<:Signal}(signals::Vector{T},
-                          prior_mean::Function, prior_cov::Function,
-                          n_samples::Integer, burn_in::Integer=0;
-                          adaption::Bool=true)
-
-    ## -----------
-    ## 1) set-up
-
-    ## create overloaded function of Prior
-    f_mu, f_cov = overload_GP_function(prior_mean, prior_cov)
-
-    ##  create dictionary of all signals
-    signal_dict = make_signal_dict(signals)
-
-    ## create dictionary of all point rains to sample from
-    samples_dict = make_sample_point_dict(signal_dict, n_samples)
-    samples_dict_prop = make_sample_point_dict(signal_dict, 1)
-
-    ## array with all coordiates
-    samp_points = collect(keys(samples_dict))
-
-    ## Compute mean
-    mu = Float64[f_mu(loc) for loc in samp_points]
-
-    ## compute inverse covariance matrix
-    Sigma = make_cov(samp_points, samp_points, f_cov)
-    Sigma_inv = inv(Sigma)
-
-    ## sd of jump distributions
-    sd_prior = sqrt(diag(Sigma))
-    sd_prop = [collect(keys(samples_dict))[ii] => sd_prior[ii] for ii in 1:length(samples_dict)]
-
-    ## -----------
-    ## 2) sampling
-
-    for i in 1:n_samples-1
-
-        mod(i, 5000)==0 ? println("iteration $i of $n_samples") : nothing
-
-        ## loop over all all point rains
-        for location in keys(samples_dict)
-
-            ## find all signals that condition on 'location'
-            signals = signal_dict[location]
-
-            ## proposal rain
-            samples_dict_prop[location][1] = samples_dict[location][i] + randn()*sd_prop[location]
-
-            ## compute acceptance probability
-            log_p_prop = log_p_prior(samp_points, samples_dict_prop, 1, mu, Sigma_inv)
-            for S in signals
-                log_p_prop += log_p_of_signal(S, samples_dict_prop, 1)
-            end
-
-            log_p_old = log_p_prior(samp_points, samples_dict, i, mu, Sigma_inv)
-            for S in signals
-                log_p_old += log_p_of_signal(S, samples_dict, i)
-            end
-
-            p_acc = min(1.0, exp(log_p_prop - log_p_old))
-
-            ## accept or not
-            if rand() < p_acc[1]
-                samples_dict[location][i+1] = samples_dict_prop[location][1]
-            else
-                samples_dict[location][i+1] =  samples_dict[location][i]
-                samples_dict_prop[location][1] = samples_dict[location][i]
-            end
-
-
-            ## adapt jump distribution, see Roberts G, Rosenthal J (2009), Sec. 3
-            ## (adaption is only during burn-in active)
-            if adaption && i < burn_in && mod(i, 50)==0
-                acc_rate = length(unique(samples_dict[location][1:i+1]))/(i+1) # current acceptance rate
-                if acc_rate > 0.44
-                    sd_prop[location] = sd_prop[location] * exp(min(0.1, 1/sqrt(i)))
-                else
-                    sd_prop[location] = sd_prop[location] / exp(min(0.1, 1/sqrt(i)))
-                end
-
-            end
-
+        if (S.sensor.domain_extent != Coor(0.0, 0.0, 0.0)) && (size(S.sensor.delta_coor,1) > 0)
+            ll += S.sensor.log_p(S.signal, R[dic_delta_coor_index[S]], mean(R[dic_domain_coor_index[S]]))
         end
 
     end
-
-    ## -----------
-    ## 3) remove burn-in samples
-
-    if burn_in > 0
-        for location in keys(samples_dict)
-            splice!(samples_dict[location], 1:burn_in)
-        end
-    end
-
-    return(samples_dict)
+    return(ll)
 end
