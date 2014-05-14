@@ -126,6 +126,29 @@ function log_p_of_signal(S::Signal, sample_dict::Dict{Location, Vector{Float64}}
     return(log_p)
 end
 
+## ---------------------------------
+## computes log_p of prior given a sample point dictionary
+
+## S:           a 'Signal' object
+## sample_dict: dictionary of all sample points
+## i_sample:    index of MCMC sample
+
+function log_p_prior_gibbs{T<:Location}(locations::Vector{T}, Samp_dict::Dict{Location, Vector{Float64}},
+                     i_sample::Integer,
+                     mu::Vector{Float64},
+                     Sigma_inv::Array{Float64, 2})
+
+    ## get rain at all locations
+    R = Float64[]
+    for loc in locations
+        push!(R, Samp_dict[loc][i_sample])
+    end
+
+    ## compute log_p
+    log_p_prior(R, mu, Sigma_inv)
+end
+
+
 
 ## ---------------------------------
 ## Gibbs sampling with adaptive jump distributions
@@ -193,12 +216,12 @@ function Gibbs{T<:Signal}(signals::Vector{T},
             samples_dict_prop[location][1] = samples_dict[location][i] + randn()*sd_prop[location]
 
             ## compute acceptance probability
-            log_p_prop = log_p_prior(samp_points, samples_dict_prop, 1, mu, Sigma_inv)
+            log_p_prop = log_p_prior_gibbs(samp_points, samples_dict_prop, 1, mu, Sigma_inv)
             for S in signals
                 log_p_prop += log_p_of_signal(S, samples_dict_prop, 1)
             end
 
-            log_p_old = log_p_prior(samp_points, samples_dict, i, mu, Sigma_inv)
+            log_p_old = log_p_prior_gibbs(samp_points, samples_dict, i, mu, Sigma_inv)
             for S in signals
                 log_p_old += log_p_of_signal(S, samples_dict, i)
             end

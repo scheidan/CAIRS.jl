@@ -6,6 +6,53 @@
 ## Andreas Scheidegger -- andreas.scheidegger@eawag.ch
 ## =======================================================
 
+
+
+## ------------------------------------------------------------------
+## transformation
+##
+## if X~N(0,1), g(X) should have a realistic rain distibution
+
+## exponential with offset
+function trans2real(R_trans::Float64)
+    k = 0.8
+    offset = 1.5
+    R_trans <= offset ? 0 : exp(k*(R_trans-offset)) - 1.0
+end
+
+## ## power law with limitation and offset
+## function trans2real(R_trans::Float64)
+##     k = 2.0
+##     offset = 1.8
+##     a = 3.5
+##     if R_trans <= offset
+##         return(0.0)
+##     else
+##         if(R_trans < a)
+##             return( (R_trans-offset)^k )
+##         else
+##             slope = k*(a-offset)^(k-1)
+##             return( (R_trans-a)*slope + (a-offset)^k )
+##         end
+##     end
+## end
+
+## ## no transformation
+## function trans2real(R_trans::Float64)
+##    R_trans
+## end
+
+## vectorized version
+function trans2real(R_trans::Vector{Float64})
+    n = size(R_trans,1)
+    R_real = zeros(n)
+    for i in 1:n
+        R_real[i] = trans2real(R_trans[i])
+    end
+    return(R_real)
+end
+
+## ------------------------------------------------------------------
 ## Functions that return a mean or covariance function for arguments
 ## of type "Coor".
 

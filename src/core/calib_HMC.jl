@@ -45,13 +45,12 @@
 ##    rain intensities for each signal -> dic_domain_coor_index
 
 ## signals:    vector of Signals
-## n_approx:   number of points per dimension to approximate domains
 
-function setupMCMC{T<:Signal}(signals::Vector{T}, n_approx::Integer=5)
+function setupMCMC{T<:Signal}(signals::Vector{T}, n_approx::Integer)
 
     coors = Coor[]                      # array holds all coordinates that are 'measured'
-    dic_delta_coor_index = [S => Integer[] for S in signals]  # Signal => [indices of coors directly measured]
-    dic_domain_coor_index = [S => Integer[] for S in signals]  # Signal => [indices of coors for approx. domains]
+    dic_delta_coor_index = [S => Int64[] for S in signals]  # Signal => [indices of coors directly measured]
+    dic_domain_coor_index = [S => Int64[] for S in signals]  # Signal => [indices of coors for approx. domains]
 
     ## loop over all Signals
     for S in signals
@@ -69,16 +68,11 @@ function setupMCMC{T<:Signal}(signals::Vector{T}, n_approx::Integer=5)
         end
 
         ## -- integrated measurements
-        ## approximate domains with a points
-
+        ## approximate domains with points
         if S.sensor.domain_extent != Coor(0.0, 0.0, 0.0)
-            ## rotate and shift in right position
-            coors_approx = unique([rotate(Coor(x, y, time), Coor(0.0, 0.0, 0.0), S.angle) + S.position
-                                   for x in linspace(0, S.sensor.domain_extent.x, n_approx),
-                                       y in linspace(0, S.sensor.domain_extent.y, n_approx),
-                                       time in linspace(0, S.sensor.domain_extent.time, n_approx)])
-            coors_approx = reshape(coors_approx, length(coors_approx)) # make vector
 
+            ## get points for approximation
+            coors_approx = domain2points(S, n_approx)
 
             ## construct index for domains
             for coor in coors_approx
@@ -98,7 +92,33 @@ end
 
 
 ## ---------------------------------
-## computes log likelihood of a signals
+## defines points to approximate a domain
+##
+## ??? cleverer approximation scheme ???
+## e.g : http://mathfaculty.fullerton.edu/mathews/n2003/SimpsonsRule2DMod.html
+##
+## S:        Signal with a domain to approximate
+
+## !!! 'cube' in log_likeli() must be adapted if this function is changed !!!
+
+function domain2points(S::Signal, n_approx::Integer)
+
+    ## distribute points along one dimension
+    dist_points_1d(extent::Real) = unique(linspace(extent/(2*n_approx), extent*(1-1/(2*n_approx)), n_approx))
+
+    ## rotate and shift in right position
+    coors = [rotate(Coor(x, y, time), Coor(0.0, 0.0, 0.0), S.angle) + S.position
+             for x in dist_points_1d(S.sensor.domain_extent.x),
+             y in dist_points_1d(S.sensor.domain_extent.y),
+             time in dist_points_1d(S.sensor.domain_extent.time)]
+
+    coors = reshape(coors, length(coors)) # reshape to vector
+    return(coors)
+end
+
+
+## ---------------------------------
+## computes log likelihood p(S|R)
 
 ## R:        vector with rain intensities corresponding to coors
 ## signals:  vector of 'Signal' object
@@ -106,21 +126,95 @@ end
 ## dic_domain_coor_index:    dictionaries as created by setupMCMC()
 
 function log_likeli{T<:Signal}(R::Vector{Float64}, signals::Vector{T},
-                               dic_delta_coor_index, dic_domain_coor_index)
+                               dic_delta_coor_index, dic_domain_coor_index,
+                               n_approx::Integer)
+
+    ## compute Volume that is represented by one coordinate
+    function cube(signal::Signal, n_approx::Integer)
+        (signal.sensor.domain_extent.x/n_approx)^(0!=signal.sensor.domain_extent.x) *
+        (signal.sensor.domain_extent.y/n_approx)^(0.0!=signal.sensor.domain_extent.y) *
+        (signal.sensor.domain_extent.time/n_approx)^(0.0!=signal.sensor.domain_extent.time)
+    end
 
     ll = 0
     for S in signals
 
         if S.sensor.domain_extent == Coor(0.0, 0.0, 0.0) # no domain
-            ll += S.sensor.log_p(S.signal, R[dic_delta_coor_index[S]])
+            ll += S.sensor.log_p(S.signal, trans2real(R[dic_delta_coor_index[S]]))
         end
         if size(S.sensor.delta_coor,1) ==  0 # no coordiantes
-            ll += S.sensor.log_p(S.signal, mean(R[dic_domain_coor_index[S]]))
+
+            int_cube = cube(S, n_approx)
+            I = sum(trans2real(R[dic_domain_coor_index[S]]))*int_cube
+
+            ll += S.sensor.log_p(S.signal, I)
         end
         if (S.sensor.domain_extent != Coor(0.0, 0.0, 0.0)) && (size(S.sensor.delta_coor,1) > 0)
-            ll += S.sensor.log_p(S.signal, R[dic_delta_coor_index[S]], mean(R[dic_domain_coor_index[S]]))
+
+            int_cube = cube(S, n_approx)
+            I = sum(trans2real(R[dic_domain_coor_index[S]]))*int_cube
+
+            ll += S.sensor.log_p(S.signal, trans2real(R[dic_delta_coor_index[S]]), I)
         end
 
     end
+    return(ll)
+end
+
+
+
+## ---------------------------------
+## computes log of p(S, R)
+function log_joint{T<:Signal}(R::Vector{Float64}, signals::Vector{T},
+                              dic_delta_coor_index, dic_domain_coor_index,
+                              mu, Sigma_inv,
+                              n_approx)
+
+    log_likeli(R, signals, dic_delta_coor_index, dic_domain_coor_index, n_approx) + log_p_prior(R, mu, Sigma_inv)
+end
+
+## ---------------------------------
+## run sampler based on package MCMC
+##
+## signals:      vector of 'Signals'
+## prior_mean:   mean function of Prior, f(c::Coor)
+## prior_cov:    covariance function of Prior, f(c1::Coor, c2::Coor)
+## n_sample:     number of MCMC sample
+## burn_in:      number of samples to remove as burn-in
+
+function runMCMC{T<:Signal}(signals::Vector{T},
+                         prior_mean::Function, prior_cov::Function,
+                         n_samples::Integer, burn_in::Integer=0)
+
+    ## -----------
+    ## 1) set-up
+
+    ## create overloaded function of Prior
+    f_mu, f_cov = overload_GP_function(prior_mean, prior_cov)
+
+    ## setup coros and dicts
+    n_approx = 10
+    coors, dic_delta_coor_index, dic_domain_coor_index = setupMCMC(signals, n_approx)
+
+    ## Compute mean
+    mu = Float64[f_mu(c) for c in coors]
+
+    ## compute inverse covariance matrix
+    Sigma = make_cov(coors, coors, f_cov)
+    Sigma_inv = inv(Sigma)
+
+    ## -----------
+    ## 2) sampling
+
+    #using MCMC
+
+    R = Float64[2.0 for i in 1:size(coors,1)]
+    println("- #signals: $(length(signals))")
+    println("- #points: $(size(coors,1))")
+    @time ll = log_joint(R, signals,
+                   dic_delta_coor_index, dic_domain_coor_index,
+                   mu, Sigma_inv,
+                   n_approx)
+
     return(ll)
 end
