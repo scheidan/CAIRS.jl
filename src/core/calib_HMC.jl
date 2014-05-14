@@ -183,8 +183,8 @@ end
 ## burn_in:      number of samples to remove as burn-in
 
 function runMCMC{T<:Signal}(signals::Vector{T},
-                         prior_mean::Function, prior_cov::Function,
-                         n_samples::Integer, burn_in::Integer=0)
+                            prior_mean::Function, prior_cov::Function,
+                            n_samples::Integer, burn_in::Integer=0)
 
     ## -----------
     ## 1) set-up
@@ -192,8 +192,8 @@ function runMCMC{T<:Signal}(signals::Vector{T},
     ## create overloaded function of Prior
     f_mu, f_cov = overload_GP_function(prior_mean, prior_cov)
 
-    ## setup coros and dicts
-    n_approx = 10
+    ## setup coors and dicts
+    n_approx = 5
     coors, dic_delta_coor_index, dic_domain_coor_index = setupMCMC(signals, n_approx)
 
     ## Compute mean
@@ -206,15 +206,26 @@ function runMCMC{T<:Signal}(signals::Vector{T},
     ## -----------
     ## 2) sampling
 
-    #using MCMC
+    f_sample(R) = log_joint(R, signals,
+                            dic_delta_coor_index, dic_domain_coor_index,
+                            mu, Sigma_inv,
+                            n_approx)
 
-    R = Float64[2.0 for i in 1:size(coors,1)]
-    println("- #signals: $(length(signals))")
-    println("- #points: $(size(coors,1))")
-    @time ll = log_joint(R, signals,
-                   dic_delta_coor_index, dic_domain_coor_index,
-                   mu, Sigma_inv,
-                   n_approx)
+    ## construct model for sampler
+    mod = MCMC.model(f_sample, init=zeros(size(coors,1)))
 
-    return(ll)
+    ## sample
+    chain = run(mod, RWM(1.0), SerialMC(steps=n_samples, burnin=burn_in))
+
+    ## -----------
+    ## 3) construct dictionary compatiable to sample_predictions()
+
+    ## create empty dictionary
+    Dic_sample = Dict{Location,Vector{Float64}}()
+
+    for i in 1:size(coors, 1)
+        Dic_sample[coors[i]] = chain.samples[:,i]
+    end
+
+    return(Dic_sample)
 end
