@@ -45,6 +45,7 @@
 ##    rain intensities for each signal -> dic_domain_coor_index
 
 ## signals:    vector of Signals
+## n_approx:   number of Coor along one dimension to represent a domain
 
 function setupMCMC{T<:Signal}(signals::Vector{T}, n_approx::Integer)
 
@@ -124,6 +125,7 @@ end
 ## signals:  vector of 'Signal' object
 ## dic_delta_coor_index:     dictionaries as created by setupMCMC()
 ## dic_domain_coor_index:    dictionaries as created by setupMCMC()
+## n_approx:   number of Coor along one dimension to represent a domain
 
 function log_likeli{T<:Signal}(R::Vector{Float64}, signals::Vector{T},
                                dic_delta_coor_index, dic_domain_coor_index,
@@ -181,10 +183,12 @@ end
 ## prior_cov:    covariance function of Prior, f(c1::Coor, c2::Coor)
 ## n_sample:     number of MCMC sample
 ## burn_in:      number of samples to remove as burn-in
+## n_approx:   number of Coor along one dimension to represent a domain
 
 function runMCMC{T<:Signal}(signals::Vector{T},
                             prior_mean::Function, prior_cov::Function,
-                            n_samples::Integer, burn_in::Integer=0)
+                            n_samples::Integer, burn_in::Integer=0, thinning=100,
+                            n_approx::Integer=5)
 
     ## -----------
     ## 1) set-up
@@ -193,7 +197,6 @@ function runMCMC{T<:Signal}(signals::Vector{T},
     f_mu, f_cov = overload_GP_function(prior_mean, prior_cov)
 
     ## setup coors and dicts
-    n_approx = 5
     coors, dic_delta_coor_index, dic_domain_coor_index = setupMCMC(signals, n_approx)
 
     ## Compute mean
@@ -215,7 +218,8 @@ function runMCMC{T<:Signal}(signals::Vector{T},
     mod = MCMC.model(f_sample, init=zeros(size(coors,1)))
 
     ## sample
-    chain = run(mod, RWM(1.0), SerialMC(steps=n_samples, burnin=burn_in))
+    sampler_algo =  MCMC.RAM(0.1, 0.234) # RWM(0.1)
+    chain = MCMC.run(mod, sampler_algo, MCMC.SerialMC(steps=n_samples, burnin=burn_in, thinning=100))
 
     ## -----------
     ## 3) construct dictionary compatiable to sample_predictions()

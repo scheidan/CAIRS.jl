@@ -15,7 +15,7 @@ module CAIRS
 ## using Distibutions
 using Cubature
 using Datetime
-using MCMC
+import MCMC
 
 ## -----------
 ## Define constantes

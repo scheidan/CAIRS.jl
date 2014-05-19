@@ -13,10 +13,11 @@
 ##
 ## if X~N(0,1), g(X) should have a realistic rain distibution
 
+
 ## exponential with offset
 function trans2real(R_trans::Float64)
-    k = 0.8
-    offset = 1.5
+    k = 0.5
+    offset = 0.5
     R_trans <= offset ? 0 : exp(k*(R_trans-offset)) - 1.0
 end
 
@@ -44,13 +45,18 @@ end
 
 ## vectorized version
 function trans2real(R_trans::Vector{Float64})
-    n = size(R_trans,1)
-    R_real = zeros(n)
-    for i in 1:n
-        R_real[i] = trans2real(R_trans[i])
-    end
-    return(R_real)
+    [trans2real(r) for r in R_trans]
 end
+
+## for sampling dictionaries
+function trans2real(R_trans::Dict{Location, Vector{Float64}})
+    R_real = Dict{Location, Vector{Float64}}()
+    for c in keys(R_trans)
+        R_real[c] = trans2real(R_trans[c])
+    end
+    R_real
+end
+
 
 ## ------------------------------------------------------------------
 ## Functions that return a mean or covariance function for arguments
