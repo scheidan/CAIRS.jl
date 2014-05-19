@@ -25,7 +25,7 @@ library(tripack)
 
 data <- read.table(file.rain, sep=",")
 calib.coor <- read.table(file.sensor.pos, sep=",")
-colnames(data) = c("x", "y", "time", "meanR", "sdR", "q.10", "q.90")
+colnames(data) = c("x", "y", "time", "medianR", "madR", "q.10", "q.90")
 colnames(calib.coor) = c("x", "y", "time", "sensor")
 
 
@@ -37,7 +37,7 @@ col.for.mean <- colorRampPalette(c("#ffffea", "#ecfbc2", "#cefecc", "#9befb4",
                                    "#044f90", "#0b1e96", "#2b0246"))(100) #  , "#6a2c5b"
 
 ## --
-col.for.sd  <- colorRampPalette(c("#a6d96a", "#ffffbf", "#d7191c"))(100) # 
+col.for.sd  <- colorRampPalette(c("#a6d96a", "#ffffbf", "#d7191c"))(100) #
 
 
 ## -- reference time
@@ -50,20 +50,20 @@ REF.TIME <- strptime("1984-10-20 00:00:00", "%Y-%m-%d %H:%M:%S", tz="GMT")
 pdf(output.name, 10, 5)
 
 
-rr1 <- c(0, max(data$meanR))
-rr2 <- range(data$sdR)
+rr1 <- c(0, max(data$medianR))
+rr2 <- range(data$madR)
 
 for(time in sort(unique(data$time))) {
 
   data.temp <- data[time==data$time,]
   calib.temp <- calib.coor
 
-  data.temp$meanR[data.temp$meanR<0] <- 0
+  data.temp$medianR[data.temp$medianR<0] <- 0
 
   date <- format(REF.TIME + time/1000 - 13, format="%Y-%m-%d %H:%M:%S")       #leap seconds...
-  
+
   ## draw Thiessen polygons
-  plot.mean <- tileplot(meanR ~ x + y, data=data.temp,
+  plot.mean <- tileplot(medianR ~ x + y, data=data.temp,
                         main=paste0(file.rain, ", ", date),
                         col.regions=col.for.mean,
                         cut=25,
@@ -93,11 +93,11 @@ for(time in sort(unique(data$time))) {
              )
       )"
            )
-    
-  }  
+
+  }
   eval(parse(text=cmd.string))
-  
-  plot.sd <- tileplot(sdR ~ x + y, data=data.temp,
+
+  plot.mad <- tileplot(madR ~ x + y, data=data.temp,
                       main=paste0(file.rain, ", ", date),
                       col.regions=col.for.sd,
                       cut=25, at=seq(rr2[1], rr2[2], length=30),
@@ -106,12 +106,10 @@ for(time in sort(unique(data$time))) {
                       xlab="x-coor",
                       ylab="y-coor"
                       )
-   
+
   print(plot.mean, split=c(1,1,2,1), more=TRUE)
-  print(plot.sd, split=c(2,1,2,1))
+  print(plot.mad, split=c(2,1,2,1))
 
 }
 
 dev.off()
-
-

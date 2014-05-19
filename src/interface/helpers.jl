@@ -37,14 +37,17 @@ function summary2csv(pred_dict::Dict, filename="predictions.csv", real::Bool=tru
 
     n_coor = mapreduce(x -> typeof(x)==Coor, +, keys(pred_dict))
     predictions = Array(Float64, n_coor, 7)
-    
+
+    ## define MAD
+    mad(x::Vector) = 1.4826 * median(abs(x.-median(x)))
+
     for i in 1:n_coor
         coor = collect(keys(pred_dict))[i]
         if typeof(coor)==Coor
-            Rcoor = pred_dict[coor]       
+            Rcoor = pred_dict[coor]
             predictions[i,:] = [coor.x, coor.y, coor.time,
-                          mean(Rcoor),
-                          std(Rcoor),
+                          median(Rcoor),
+                          mad(Rcoor),
                           quantile(Rcoor, 0.1),
                           quantile(Rcoor, 0.9)]'
         end
@@ -70,7 +73,7 @@ function sensor2csv(signals::Vector, filename="sensors.csv")
 
         ## Coordinates
         if length(sig.sensor.delta_coor) > 0
-            for c in sig.sensor.delta_coor 
+            for c in sig.sensor.delta_coor
                 coor = sig.position + c
                 positions = [positions,
                              [coor.x coor.y coor.time "coor"]]
@@ -88,7 +91,7 @@ function sensor2csv(signals::Vector, filename="sensors.csv")
                                            sig.position.y + sig.sensor.domain_extent.y*b2,
                                            sig.position.time + sig.sensor.domain_extent.time*b3),
                                       sig.position, sig.angle)
-                        
+
                         positions = [positions,
                                      [coor.x coor.y coor.time "domain_$d"]]
                     end
