@@ -147,14 +147,14 @@ function log_likeli{T<:Signal}(R::Vector{Float64}, signals::Vector{T},
         if size(S.sensor.delta_coor,1) ==  0 # no coordiantes
 
             int_cube = cube(S, n_approx)
-            I = sum(trans2real(R[dic_domain_coor_index[S]]))*int_cube
+            I = sum(S.sensor.f_int(trans2real(R[dic_domain_coor_index[S]])))*int_cube
 
             ll += S.sensor.log_p(S.signal, I)
         end
         if (S.sensor.domain_extent != Coor(0.0, 0.0, 0.0)) && (size(S.sensor.delta_coor,1) > 0)
 
             int_cube = cube(S, n_approx)
-            I = sum(trans2real(R[dic_domain_coor_index[S]]))*int_cube
+            I = sum(S.sensor.f_int(trans2real(R[dic_domain_coor_index[S]])))*int_cube
 
             ll += S.sensor.log_p(S.signal, trans2real(R[dic_delta_coor_index[S]]), I)
         end

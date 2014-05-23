@@ -19,23 +19,47 @@ immutable Sensor
 
     ## cube of integration, relative to sensor position
     domain_extent::Coor
+
+    ## function applied on the rain before integration: \int f_int(R(c)) dc
+    f_int::Function
 end
 
 ## constructor assumes no integration if not specified
 function Sensor(log_p::Function, delta_coor::Vector{Coor})
     coor = Coor(0.0, 0.0, 0.0)
-    Sensor(log_p, delta_coor, coor)
+    identity(x) = x
+    Sensor(log_p, delta_coor, coor, identity)
+end
+
+## constructor assumes no integration if not specified
+function Sensor(log_p::Function, delta_coor::Vector{Coor})
+    coor = Coor(0.0, 0.0, 0.0)
+    identity(x) = x
+    Sensor(log_p, delta_coor, coor, identity)
 end
 
 ## constructor assumes no offset if not specified
 function Sensor(log_p::Function, int_domain::Coor)
-    Sensor(log_p, Coor[], int_domain)
+        identity(x) = x
+    Sensor(log_p, Coor[], int_domain, identity)
+end
+
+## constructor assumes no offset if not specified
+function Sensor(log_p::Function, int_domain::Coor, f_int::Function)
+    Sensor(log_p, Coor[], int_domain, f_int)
+end
+
+## constructor assumes no offset if not specified
+function Sensor(log_p::Function, delta_coor::Vector{Coor}, int_domain::Coor)
+    identity(x) = x
+    Sensor(log_p, delta_coor, int_domain, identity)
 end
 
 ## constructor assumes no offset and no integration if not specified
 function Sensor(log_p::Function)
     coor = Coor(0.0, 0.0, 0.0)
-    Sensor(log_p, [coor], coor)
+    identity(x) = x
+    Sensor(log_p, [coor], coor, identity)
 end
 
 
@@ -54,9 +78,10 @@ function show(sensor::Sensor, offset=""::String)
             println(offset, "   ", coor)
         end
     end
-    
+
     if sensor.domain_extent != Coor(0.0, 0.0, 0.0)
         println(offset, "- integration domain: $(sensor.domain_extent)")
+        println(offset, "- integration function: $(sensor.f_int)")
     else
         println(offset, "- no integration")
     end

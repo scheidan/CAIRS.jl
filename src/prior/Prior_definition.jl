@@ -14,29 +14,29 @@
 ## if X~N(0,1), g(X) should have a realistic rain distibution
 
 
-## exponential with offset
-function trans2real(R_trans::Float64)
-    k = 0.5
-    offset = 0.5
-    R_trans <= offset ? 0 : exp(k*(R_trans-offset)) - 1.0
-end
-
-## ## power law with limitation and offset
+## ## exponential with offset
 ## function trans2real(R_trans::Float64)
-##     k = 2.0
-##     offset = 1.8
-##     a = 3.5
-##     if R_trans <= offset
-##         return(0.0)
-##     else
-##         if(R_trans < a)
-##             return( (R_trans-offset)^k )
-##         else
-##             slope = k*(a-offset)^(k-1)
-##             return( (R_trans-a)*slope + (a-offset)^k )
-##         end
-##     end
+##     k = 0.5
+##     offset = 0.5
+##     R_trans <= offset ? 0 : exp(k*(R_trans-offset)) - 1.0
 ## end
+
+## power law with limitation and offset
+function trans2real(R_trans::Float64)
+    k = 2.0
+    offset = 1.8
+    a = 3.5
+    if R_trans <= offset
+        return(0.0)
+    else
+        if(R_trans < a)
+            return( (R_trans-offset)^k )
+        else
+            slope = k*(a-offset)^(k-1)
+            return( (R_trans-a)*slope + (a-offset)^k )
+        end
+    end
+end
 
 ## ## no transformation
 ## function trans2real(R_trans::Float64)
