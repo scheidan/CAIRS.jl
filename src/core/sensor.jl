@@ -49,7 +49,7 @@ function Sensor(log_p::Function, int_domain::Coor, f_int::Function)
     Sensor(log_p, Coor[], int_domain, f_int)
 end
 
-## constructor assumes no offset if not specified
+## constructor assumes identity
 function Sensor(log_p::Function, delta_coor::Vector{Coor}, int_domain::Coor)
     identity(x) = x
     Sensor(log_p, delta_coor, int_domain, identity)

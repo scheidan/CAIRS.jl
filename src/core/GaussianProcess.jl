@@ -180,3 +180,11 @@ function log_p_prior(R::Vector{Float64},
     neg_log_p = D' * Sigma_inv * D
     return(-neg_log_p[1])
 end
+
+## gardient of log_p_prior()
+function log_p_prior_grad(R::Vector{Float64},
+                          mu::Vector{Float64},
+                          Sigma_inv::Array{Float64, 2})
+    D = R - mu
+    -2 .* Sigma_inv * D
+end
