@@ -13,9 +13,9 @@ immutable Signal{T}
     ## signal obtained by sensor
     signal::T
 
-    ## sensor 
+    ## sensor
     sensor::Sensor
- 
+
     ## coordinates of the sensor
     position::Coor
 
@@ -42,7 +42,7 @@ function show(signal::Signal)
     println("- signal type: $(typeof(signal.signal))")
     println("- sensor:")
     show(signal.sensor, "   ")
-   
+
 end
 
 
@@ -51,14 +51,14 @@ end
 ## Find all signals that are near enough (in time) to
 ## have an impact on the predicted Locations
 ## !!! Checks only distance in time !!!
-## 
+##
 ## loc_pred:  vector with locations for predictions
 ## signals:   vector of avaiable Signals
 ## delta:     max. distance to be considered
-## 
+##
 ## returns a vector of signals that are "close" in time to locations
 
-function find_near_signals(loc_pred::Vector, signals::Vector, delta::Real)
+function find_near_signals(loc_pred::Vector, signals::Vector, delta::Float64)
 
     ## Find the extrem time-coordiantes of 'loc_pred'
     tmin = Inf
@@ -72,11 +72,11 @@ function find_near_signals(loc_pred::Vector, signals::Vector, delta::Real)
         else
             tmin = min(tmin, loc.time)
             tmax = max(tmax, loc.time)
-        end                
+        end
     end
     tmin -= delta
     tmax += delta
-    
+
     ## Find signals that are within (tmin, tmax)
     signals_near = Signal[]
     for sig in signals
@@ -84,7 +84,7 @@ function find_near_signals(loc_pred::Vector, signals::Vector, delta::Real)
              (sig.position + sig.sensor.domain_extent).time,
              [(sig.position + i).time for i in sig.sensor.delta_coor]]
 
-        if any(t .< tmax) && any(t .> tmin) 
+        if any(t .< tmax) && any(t .> tmin)
             push!(signals_near, sig)
         end
     end

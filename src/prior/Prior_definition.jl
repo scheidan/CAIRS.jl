@@ -16,7 +16,7 @@
 ## -----------
 ## constant
 
-function mean_constant(;mean::Real=0.0)
+function mean_constant(;mean::Float64=0.0)
 
     println("- Prior has a constant mean of $mean.")
 
@@ -38,17 +38,17 @@ end
 ## Equation (4.18) in Rasmussen, C. E. and Williams, C. K. I. (2006) Gaussian processes
 ## for machine learning, Massachusett, MIT Press.
 
-function cov_exponential(;sigma::Real=10.0,       # standard deviation of GP
-                         l_spatial::Real=3000.0, # spatial correlation length
+function cov_exponential(;sigma::Float64=10.0,       # standard deviation of GP
+                         l_spatial::Float64=3000.0, # spatial correlation length
                          l_temporal=600.0*1000, # temporal correlation length [milliseconds]
-                         gamma::Real=1.0)        # exponent for smoothness in [0, 2]
+                         gamma::Float64=1.0)        # exponent for smoothness in [0, 2]
 
     (gamma<0) | (gamma>2) ? error("'gamma' must be in [0, 2]!") : nothing
 
     ## convert TimePeriod objects in milliseconds
     if typeof(l_temporal) <: Datetime.TimePeriod
         temp = l_temporal - second(0)
-        l_temporal = 1000*convert(Real, temp)
+        l_temporal = 1000*convert(Float64, temp)
     end
 
     println("- Prior has a separable gamma-exponential covariance function with:")
@@ -76,14 +76,14 @@ end
 ## Gneiting, T. (2002) Compactly Supported Correlation Functions. Journal
 ##    of Multivariate Analysis, 83(2), 493-508.
 
-function cov_sphere(;sigma::Real=10.0,       # standard deviation of GP
-                         l_spatial::Real=3000.0, # spatial correlation length
+function cov_sphere(;sigma::Float64=10.0,       # standard deviation of GP
+                         l_spatial::Float64=3000.0, # spatial correlation length
                          l_temporal=600.0*1000) # temporal correlation length [milliseconds]
 
     ## convert TimePeriod objects in milliseconds
     if typeof(l_temporal) <: Datetime.TimePeriod
         temp = l_temporal - second(0)
-        l_temporal = 1000*convert(Real, temp)
+        l_temporal = 1000*convert(Float64, temp)
     end
 
     println("- Prior has a spherical covariance function with:")

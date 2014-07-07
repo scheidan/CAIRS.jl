@@ -217,7 +217,7 @@ end
 ## proportional to joint density p(R1, R2, ..., Rn, I1, I2, ...)
 
 function log_p_prior{T<:Location}(locations::Vector{T}, Samp_dict::Dict{Location, Vector{Float64}},
-                     i_sample::Integer,
+                     i_sample::Int,
                      mu::Vector{Float64},
                      Sigma_inv::Array{Float64, 2})
 

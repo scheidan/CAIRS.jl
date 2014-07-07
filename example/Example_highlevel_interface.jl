@@ -42,7 +42,7 @@ sensor_MWL = Sensor(log_p_MWL, Coor(6, 0, 0)) # integrates along a path of lengt
 ## ---------------------------------
 ## Define prior
 
-mean_GP = mean_constant(mean=2)
+mean_GP = mean_constant(mean=2.0)
 
 cov_GP = cov_exponential(sigma=10.0,           # standard deviation of GP
                          l_spatial=1.5,        # spatial correlation length
