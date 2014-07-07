@@ -5,7 +5,9 @@
 [![Build Status](https://travis-ci.org/scheidan/CAIRS.jl.svg?branch=HMC)](https://travis-ci.org/scheidan/CAIRS.jl)
 [![Coverage Status](https://img.shields.io/coveralls/scheidan/CAIRS.jl.svg)](https://coveralls.io/r/scheidan/CAIRS.jl?branch=HMC)
 
-*This is an experimental branch to include automatic differencing to Hamiltonian Monte Carlo*
+
+## *This is an experimental branch to include automatic differencing to Hamiltonian Monte Carlo*
+
 
 _CAIRS_ is a framework to reconstruct rain fields by assimilating
 signals of fundamentally different rain sensors.

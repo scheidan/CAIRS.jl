@@ -29,7 +29,7 @@ function predict{T1<:Location, T2<:Signal}(loc_pred::Array{T1}, signals::Vector{
     ## convert TimePeriod objects in milliseconds
     if typeof(delta) <: Datetime.TimePeriod
         temp = delta - second(0)
-        delta = 1000*convert(Real, temp)
+        delta = 1000*convert(Float64, temp)
     end
 
     ## reshape to Vector

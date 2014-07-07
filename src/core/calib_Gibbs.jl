@@ -70,7 +70,7 @@ end
 ## n_sample:      length of the initialized vector for MCMC sample
 
 function make_sample_point_dict(signal_dict::Dict{Location, Vector{Signal}},
-                                n_samples::Integer)
+                                n_samples::Int)
 
     ## create empty dictionary
     Dic = Dict{Location,Vector{Float64}}()
@@ -90,7 +90,7 @@ end
 ## sample_dict: dictionary of all sample points
 ## i_sample:    index of MCMC sample
 
-function log_p_of_signal(S::Signal, sample_dict::Dict{Location, Vector{Float64}}, i_sample::Integer)
+function log_p_of_signal(S::Signal, sample_dict::Dict{Location, Vector{Float64}}, i_sample::Int)
 
     ## find all coordinates on that S is conditioned
     if size(S.sensor.delta_coor,1) > 0
@@ -169,7 +169,7 @@ end
 
 function Gibbs{T<:Signal}(signals::Vector{T},
                           prior_mean::Function, prior_cov::Function,
-                          n_samples::Integer, burn_in::Integer=0;
+                          n_samples::Int, burn_in::Int=0;
                           adaption::Bool=true)
 
     ## -----------

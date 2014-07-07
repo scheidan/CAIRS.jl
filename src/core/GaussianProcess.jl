@@ -172,6 +172,7 @@ end
 ## ---------------------------------
 ## proportional to joint density p(R1, R2, ..., Rn, I1, I2, ...)
 
+
 function log_p_prior(R::Vector{Float64},
                      mu::Vector{Float64},
                      Sigma_inv::Array{Float64, 2})

@@ -28,9 +28,9 @@
 
 function sample_preditions{T<:Location}(loc_pred::Vector{T},
                                         R_dict_cal::Dict{Location, Vector{Float64}},
-                                        n_samples::Integer,
+                                        n_samples::Int,
                                         prior_mean::Function, prior_cov::Function;
-                                        block_size::Real = 200)
+                                        block_size::Int = 200)
 
     ## separate locations that have already been used used for calibration
     loc_pred_cal = filter(x -> in(x, collect(keys(R_dict_cal))),  loc_pred)
@@ -82,7 +82,7 @@ end
 
 function sample_preditions_block{T<:Location}(loc_pred::Vector{T},
                                               R_dict_cal::Dict{Location, Vector{Float64}},
-                                              n_samples::Integer,
+                                              n_samples::Int,
                                               prior_mean::Function, prior_cov::Function)
 
     loc_c = collect(keys(R_dict_cal))       # locations of calib
