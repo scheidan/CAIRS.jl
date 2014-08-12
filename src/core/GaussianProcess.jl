@@ -180,10 +180,27 @@ end
 ## ---------------------------------
 ## construct covariance matrix
 
+
 function make_cov{T1<:Location, T2<:Location}(loc_1::Vector{T1}, loc_2::Vector{T2},
                   f_cov::Function)
+    ## if asymmetric
+    if loc_1 != loc_2
+        Sigma = Float64[f_cov(l1, l2) for l1 in loc_1, l2 in loc_2]
+    else
+        ## for symmetric matrices
+        n = length(loc_1)
+        Sigma = zeros(n, n)
+        for j in 1:n
+            for i in j:n
+                if i !=j
+                    Sigma[i,j] = Sigma[j,i] = f_cov(loc_1[i], loc_2[j])
+                else
+                    Sigma[i,j] = f_cov(loc_1[i], loc_2[j])
+                end
+            end
+        end
 
-    Sigma = Float64[f_cov(l1, l2) for l1 in loc_1, l2 in loc_2]
+    end
 
     return(Sigma)
 end
