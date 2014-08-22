@@ -169,8 +169,7 @@ function Gibbs{T<:Signal}(signals::Vector{T},
     mu = Float64[f_mu(loc) for loc in samp_points]
 
     ## compute inverse covariance matrix
-    Sigma = make_cov(samp_points, samp_points, f_cov)
-    Sigma_inv = inv(Sigma)
+    Sigma = PDMats.PDMat(make_cov(samp_points, samp_points, f_cov))
 
     ## sd of jump distributions
     sd_prior = sqrt(diag(Sigma))
@@ -193,12 +192,12 @@ function Gibbs{T<:Signal}(signals::Vector{T},
             samples_dict_prop[location][1] = samples_dict[location][i] + randn()*sd_prop[location]
 
             ## compute acceptance probability
-            log_p_prop = log_p_prior(samp_points, samples_dict_prop, 1, mu, Sigma_inv)
+            log_p_prop = log_p_prior(samp_points, samples_dict_prop, 1, mu, Sigma)
             for S in signals
                 log_p_prop += log_p_of_signal(S, samples_dict_prop, 1)
             end
 
-            log_p_old = log_p_prior(samp_points, samples_dict, i, mu, Sigma_inv)
+            log_p_old = log_p_prior(samp_points, samples_dict, i, mu, Sigma)
             for S in signals
                 log_p_old += log_p_of_signal(S, samples_dict, i)
             end

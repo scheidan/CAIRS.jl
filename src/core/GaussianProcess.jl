@@ -206,28 +206,6 @@ function make_cov{T1<:Location, T2<:Location}(loc_1::Vector{T1}, loc_2::Vector{T
 end
 
 
-## parallel version
-## not efficient, too much overhead...
-
-## function make_cov(loc_1::Vector, loc_2::Vector,
-##                   f_cov::Function)
-
-##     f_cov_tuple(tup) = f_cov(tup[1], tup[2])
-
-##     ## input matrix with tuples
-##     Mat_in = [tuple(x, y) for x in loc_1, y in loc_2]
-
-##     ## compute in parallel
-##     Sigma_any = reshape(pmap(f_cov_tuple, Mat_in), size(Mat_in))
-
-##     ## convert in type Array(Float64), Hack?
-##     Sigma = similar(Sigma_any, Float64)
-##     Sigma[:] = Sigma_any
-
-##     return(Sigma)
-## end
-
-
 
 
 ## ---------------------------------
@@ -236,7 +214,7 @@ end
 function log_p_prior{T<:Location}(locations::Vector{T}, Samp_dict::Dict{Location, Vector{Float64}},
                      i_sample::Int,
                      mu::Vector{Float64},
-                     Sigma_inv::Array{Float64, 2})
+                     Sigma::PDMats.AbstractPDMat)
 
     ## get rain at all locations
     R = Float64[]
@@ -246,6 +224,6 @@ function log_p_prior{T<:Location}(locations::Vector{T}, Samp_dict::Dict{Location
 
     ## log density
     D = R - mu
-    neg_log_p = D' * Sigma_inv * D
-    return(-neg_log_p[1])
+    neg_log_p = PDMats.invquad(Sigma, D) # compute D' inv(Sigma) * D
+    return(-neg_log_p)
 end

@@ -51,7 +51,7 @@ function predict{T1<:Location, T2<:Signal}(loc_pred::Array{T1}, signals::Vector{
 
     println("\n--- prediction ---")
     println(" ", length(loc), " locations")
-    R_dict_pred = sample_preditions(loc, Samp_dict_cal, n_sample_pred, prior_mean, prior_cov, block_size=200)
+    R_dict_pred = sample_preditions(loc, Samp_dict_cal, n_sample_pred, prior_mean, prior_cov, block_size=500)
 
     R_dict_pred
 

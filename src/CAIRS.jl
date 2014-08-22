@@ -15,6 +15,7 @@ module CAIRS
 ## using Distibutions
 using Cubature
 using Datetime
+import PDMats
 
 ## -----------
 ## Define constantes

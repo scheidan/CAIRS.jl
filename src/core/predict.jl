@@ -43,11 +43,21 @@ function sample_preditions{T<:Location}(loc_pred::Vector{T},
     ## initialize empty dict
     R_dict_pred = Dict{Location,Vector{Float64}}()
 
+    ## create overlaoded function of Prior
+    f_mu, f_cov = overload_GP_function(prior_mean, prior_cov)
+
+    ## compute mean and covariance of calibration points
+    loc_c = collect(keys(R_dict_cal))       # locations of calib
+    mu_c = Float64[f_mu(loc) for loc in loc_c]
+    Sigma_cc = PDMats.PDMat(make_cov(loc_c, loc_c, f_cov))
+
     ## sample each block
     for i in 1:n_blocks
         index = ((i-1)*block_size+1) : min(i*block_size, size(loc_pred, 1))
         merge!(R_dict_pred,
-               sample_preditions_block(loc_pred[index], R_dict_cal, n_samples, prior_mean, prior_cov))
+               sample_preditions_block(loc_pred[index], R_dict_cal, n_samples,
+                                       prior_mean, prior_cov,
+                                       mu_c, Sigma_cc))
     end
 
     ## -----------
@@ -83,7 +93,9 @@ end
 function sample_preditions_block{T<:Location}(loc_pred::Vector{T},
                                               R_dict_cal::Dict{Location, Vector{Float64}},
                                               n_samples::Int,
-                                              prior_mean::Function, prior_cov::Function)
+                                              prior_mean::Function, prior_cov::Function,
+                                              mu_c::Vector{Float64},
+                                              Sigma_cc::PDMats.AbstractPDMat)
 
     loc_c = collect(keys(R_dict_cal))       # locations of calib
 
@@ -91,16 +103,14 @@ function sample_preditions_block{T<:Location}(loc_pred::Vector{T},
     f_mu, f_cov = overload_GP_function(prior_mean, prior_cov)
 
     ## compute means
-    mu_c = Float64[f_mu(loc) for loc in loc_c]
     mu_p = Float64[f_mu(loc) for loc in loc_pred]
 
     ## compute conditional covariance matrix
-    Sigma_cc_inv = inv(make_cov(loc_c, loc_c, f_cov))
     Sigma_pp = make_cov(loc_pred, loc_pred, f_cov)
     Sigma_pc = make_cov(loc_pred, loc_c, f_cov)
 
-    Sigma_temp = Sigma_pc * Sigma_cc_inv
-    Sigma_cond = Sigma_pp - Sigma_temp * Sigma_pc'
+    ## Sigma_cond = Sigma_pp - Sigma_pc * inv(Sigma) * Sigma_pc'
+    Sigma_cond = Sigma_pp - PDMats.X_invA_Xt(Sigma_cc, Sigma_pc)
     Sigma_cond_chol = chol(Sigma_cond, :L)
 
     ## number of sample in R_dict_cal
@@ -119,8 +129,8 @@ function sample_preditions_block{T<:Location}(loc_pred::Vector{T},
             push!(R, R_dict_cal[c][rand_index])
         end
 
-        ## mean
-        mean = mu_p + Sigma_temp * (R - mu_c)
+        ## mean = mu_p + Sigma_pc * inv(Sigma_cc) * (R - mu_c)
+        mean = mu_p + Sigma_pc * (Sigma_cc \ (R - mu_c))
 
         ## sample from multivariate normal
         R_array_pred[i,:] = mean + Sigma_cond_chol*randn(n_pred)
