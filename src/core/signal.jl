@@ -58,7 +58,7 @@ end
 ##
 ## returns a vector of signals that are "close" in time to locations
 
-function find_near_signals(loc_pred::Vector, signals::Vector, delta::Float64)
+function find_near_signals(loc_pred::Vector, signals::Vector, delta::Real)
 
     ## Find the extrem time-coordiantes of 'loc_pred'
     tmin = Inf
