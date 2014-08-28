@@ -45,10 +45,9 @@ function cov_exponential(;sigma::Float64=10.0,       # standard deviation of GP
 
     (gamma<0) | (gamma>2) ? error("'gamma' must be in [0, 2]!") : nothing
 
-    ## convert TimePeriod objects in milliseconds
-    if typeof(l_temporal) <: Datetime.TimePeriod
-        temp = l_temporal - second(0)
-        l_temporal = 1000*convert(Float64, temp)
+    ## convert to milliseconds
+    if typeof(l_temporal) <: Dates.Period
+        l_temporal = Dates.toms(l_temporal)
     end
 
     println("- Prior has a separable gamma-exponential covariance function with:")
@@ -80,10 +79,9 @@ function cov_sphere(;sigma::Float64=10.0,       # standard deviation of GP
                          l_spatial::Float64=3000.0, # spatial correlation length
                          l_temporal=600.0*1000) # temporal correlation length [milliseconds]
 
-    ## convert TimePeriod objects in milliseconds
-    if typeof(l_temporal) <: Datetime.TimePeriod
-        temp = l_temporal - second(0)
-        l_temporal = 1000*convert(Float64, temp)
+   ## convert to milliseconds
+    if typeof(l_temporal) <: Dates.Period
+        l_temporal = Dates.toms(l_temporal)
     end
 
     println("- Prior has a spherical covariance function with:")

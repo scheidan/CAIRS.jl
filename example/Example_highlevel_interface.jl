@@ -8,7 +8,7 @@
 
 
 using CAIRS
-using Datetime
+using Dates
 using Distributions
 
 ## ---------------------------------
@@ -46,7 +46,7 @@ mean_GP = mean_constant(mean=2.0)
 
 cov_GP = cov_exponential(sigma=10.0,           # standard deviation of GP
                          l_spatial=1.5,        # spatial correlation length
-                         l_temporal=minute(1), # temporal correlation length
+                         l_temporal=Minute(1), # temporal correlation length
                          gamma=1.0)           # exponent for smoothness in [0, 2]
 
 
@@ -95,20 +95,20 @@ sensor2csv(sig, "sensor_coor.csv")
 nn = 20
 loc_pred = [Coor(i, j, time)
             for i=linspace(0, 10, nn), j=linspace(0, 10, nn),
-            time=datetime(2013, 11, 22, 13, 15, 00) : minute(1): datetime(2013, 11, 22, 13, 20, 00) ]
+            time=DateTime(2013, 11, 22, 13, 15, 00) : Minute(1): DateTime(2013, 11, 22, 13, 20, 00) ]
 
 
 ## -----------
 ## Compute predictions
 
-R_pred = predict(loc_pred,               # vector or array with locations for predictions
+@time R_pred = predict(loc_pred,               # vector or array with locations for predictions
                  sig,                    # vector of signals
                  mean_GP,                # mean function of prior
                  cov_GP,                 # covariance function of prior
                  n_sample_calib = 20000, # number of iterations of the Gibbs sampler
                  burn_in = 5000,         # number of removed samples (and length of adaptation)
                  n_sample_pred = 6000,   # number of samples for predictions
-                 delta = seconds(90))    # consider all signals within time 'delta'
+                 delta = Second(90))    # consider all signals within time 'delta'
                                          #  from prediction points
 
 

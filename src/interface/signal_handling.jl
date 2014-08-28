@@ -2,11 +2,11 @@
 ## Continuous Assimilation of Integrating Rain Sensors (CAIRS)
 ##
 ## Description: high-level interface to import signals
-## 
+##
 ## Andreas Scheidegger -- andreas.scheidegger@eawag.ch
 ## =======================================================
 
-    
+
 
 ## ---------------------------------
 ## add signals of a file to a signal vector
@@ -38,15 +38,15 @@ function add_signal!(signals::Vector{Signal}, file::String,
     for i in 1:size(data,1)
         ## convert time. Somewhat a hack, no proper parsing yet
         t_string = data[i,1]
-        time = datetime(int(t_string[7:10]), int(t_string[4:5]),
+        time = DateTime(int(t_string[7:10]), int(t_string[4:5]),
                         int(t_string[1:2]), int(t_string[12:13]),
-                        int(t_string[15:16]), int(t_string[18:19])) - REF_TIME
+                        int(t_string[15:16]), int(t_string[18:19]))
 
         new_signal = Signal(data[i, 2], sensor, Coor(position.x, position.y, time), angle)
         push!(signals, new_signal)
-        
+
     end
-    
+
 end
 
 
@@ -63,7 +63,7 @@ end
 ## remove signals measured with "sensor"
 function remove_signal!(signals::Vector{Signal},
                         sensor::Sensor)
-    
+
     filter!(x -> x.sensor!=sensor, signals)
 end
 
@@ -71,7 +71,7 @@ end
 function remove_signal!(signals::Vector{Signal},
                         position::Coor,
                         angle::Float64=0.0)
-    
+
     f_filter(x) = !(x.position.x==position.x && x.position.y==position.y && x.angle==angle)
     filter!(f_filter, signals)
 end

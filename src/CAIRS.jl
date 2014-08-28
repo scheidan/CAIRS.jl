@@ -14,13 +14,13 @@ module CAIRS
 
 ## using Distibutions
 using Cubature
-using Datetime
+using Dates
 import PDMats
 
 ## -----------
 ## Define constantes
 
-const REF_TIME = datetime(1984, 10, 20) # reference point in time. Count milliseconds from this date.
+const REF_TIME = Dates.DateTime(1984, 10, 20) # reference point in time. Count milliseconds from this date.
 
 ## -----------
 ## Core functions
@@ -58,9 +58,6 @@ export chains2csv, summary2csv, sensor2csv
 
 ## prior
 export mean_constant, cov_exponential, cov_sphere
-
-## export so that user can supply DateTime objects
-export DateTime, datetime
 
 
 end

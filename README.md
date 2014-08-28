@@ -45,11 +45,11 @@ be updated with `Pkg.update()`.
 # Example
 
 First, the package _CAIRS_ must be loaded. For convinience, it is also
-recommended to load the packages `Datetime` and `Distributions`:
+recommended to load the packages `Dates` and `Distributions`:
 
 ```Julia
 using CAIRS
-using Datetime
+using Dates
 using Distributions
 ```
 
@@ -113,7 +113,7 @@ mean_GP = mean_constant(mean=2)
 
 cov_GP = cov_exponential(sigma=10.0,           # standard deviation of GP
                          l_spatial=1.5,        # spatial correlation length
-                         l_temporal=minute(1), # temporal correlation length
+                         l_temporal=Minute(1), # temporal correlation length
                          gamma=1.0)            # exponent for smoothness in [0, 2]
 ```
 Other types of covariance functions will be added in future.
@@ -159,14 +159,14 @@ sensor2csv(sig, "sensor_coor.csv")
 
 The location for which a prediction of the rain intesity is desired must be
 defined as an `Array` or `Vector` of coordinates. Coordinates are
-defined with `Coor(x, y, time)`. Time can be a number or a `datetime`
+defined with `Coor(x, y, time)`. Time can be a number or a `DateTime`
 object.
 ```Julia
 ### create a simple grid
 nn = 20
 loc_pred = [Coor(i, j, time)
             for i=linspace(0, 10, nn), j=linspace(0, 10, nn),
-            time=datetime(2013, 11, 22, 13, 15, 00) : minute(1): datetime(2013, 11, 22, 13, 20, 00) ]
+            time=DateTime(2013, 11, 22, 13, 15, 00) : Minute(1): DateTime(2013, 11, 22, 13, 20, 00) ]
 ```
 This produced a regular grid, but the point could also be irregularly distributed. Also, not only predictions for coordinates but also for intesities integrated over a domain can be made. Domains are defined by the function `Domain`.
 

@@ -26,10 +26,9 @@ function predict{T1<:Location, T2<:Signal}(loc_pred::Array{T1}, signals::Vector{
                                            n_sample_calib::Int = 20000, burn_in::Int = -1,
                                            n_sample_pred::Int = 5000, delta = 5*60*1000)
 
-    ## convert TimePeriod objects in milliseconds
-    if typeof(delta) <: Datetime.TimePeriod
-        temp = delta - second(0)
-        delta = 1000*convert(Float64, temp)
+    ## convert milliseconds
+    if typeof(delta) <: Dates.Period
+        delta = Dates.toms(delta)
     end
 
     ## reshape to Vector

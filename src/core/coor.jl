@@ -26,9 +26,9 @@ end
 Coor(x, y) = Coor(x, y, 0.0)
 
 ## convert Datetime in milliseconds since REF_TIME
-function Coor(x, y, time::DateTime)
+function Coor(x, y, time::Dates.DateTime)
     time_msec = time - REF_TIME
-    Coor(x, y, time_msec)
+    Coor(x, y, time_msec.value)
 end
 
 ## addition and subtraction of coordinates

@@ -37,7 +37,7 @@ col.for.mean <- colorRampPalette(c("#ffffea", "#ecfbc2", "#cefecc", "#9befb4",
                                    "#044f90", "#0b1e96", "#2b0246"))(100) #  , "#6a2c5b"
 
 ## --
-col.for.sd  <- colorRampPalette(c("#a6d96a", "#ffffbf", "#d7191c"))(100) # 
+col.for.sd  <- colorRampPalette(c("#a6d96a", "#ffffbf", "#d7191c"))(100) #
 
 
 ## -- reference time
@@ -60,8 +60,8 @@ for(time in sort(unique(data$time))) {
 
   data.temp$meanR[data.temp$meanR<0] <- 0
 
-  date <- format(REF.TIME + time/1000 - 13, format="%Y-%m-%d %H:%M:%S")       #leap seconds...
-  
+  date <- format(REF.TIME + time/1000, format="%Y-%m-%d %H:%M:%S")       #leap seconds...
+
   ## draw Thiessen polygons
   plot.mean <- tileplot(meanR ~ x + y, data=data.temp,
                         main=paste0(file.rain, ", ", date),
@@ -93,10 +93,10 @@ for(time in sort(unique(data$time))) {
              )
       )"
            )
-    
-  }  
+
+  }
   eval(parse(text=cmd.string))
-  
+
   plot.sd <- tileplot(sdR ~ x + y, data=data.temp,
                       main=paste0(file.rain, ", ", date),
                       col.regions=col.for.sd,
@@ -106,12 +106,10 @@ for(time in sort(unique(data$time))) {
                       xlab="x-coor",
                       ylab="y-coor"
                       )
-   
+
   print(plot.mean, split=c(1,1,2,1), more=TRUE)
   print(plot.sd, split=c(2,1,2,1))
 
 }
 
 dev.off()
-
-
