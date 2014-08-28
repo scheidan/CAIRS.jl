@@ -124,10 +124,11 @@ The next step is to import the signals. Every signal must have an
 attached sensor. Signals can be constructed with the function
 `Signal` or more conveniently with `add_signal()`.
 
-Currently `add_signal()' expected that the signals of every sensor are
+Currently `add_signal()` expected that the signals of every sensor are
 stored in a separate file. The file must contain two columns:
-- Column 1: date and time in *exactly* the following form: "22.11.2013 13:15:30"
-- Column 2: signal values
+
+ - Column 1: date and time
+ - Column 2: signal values
 
 ```julia
 ## path to example data that come with the CAIRS package
@@ -138,19 +139,23 @@ sig = Signal[]                          # create an empty array for Signals
 
 add_signal!(sig,                        # add signal to vector 'sig'
             path1,                      # file name
-            sensor_gauge,               # gauge sensor, defined above
-            Coor(5, 6)                  # coordinate of the sensor
-            )                           # optional argument: delim=','
+            sensor_gauge,               # sensor
+            Coor(5, 6),                 # coordinate of the sensor
+            date_format="d.m.yyyy HH:MM:SS",
+            delim=',')                  # delimitation character
+
 
 add_signal!(sig, path2,
-            sensor_MWL,                 # MWL sensor, defined above
+            sensor_MWL,                 # MWL link
             Coor(4.2, 2),               # coordinate of one end point of the sensor
-            0.9)                        # rotation around the point defined above in [rad]
+            0.9,                        # rotation around the point defined above in [rad]
+            date_format="d.m.yyyy HH:MM:SS",
+            delim=',')
 ```
 
 Information about a signal can be printed with `show`, e.g. `show(sig[1])`.
 
-Writting the sensor positions in a file is useful for plotting:
+Writing the sensor positions in a file is useful for plotting:
 ```Julia
 sensor2csv(sig, "sensor_coor.csv")
 ```

@@ -12,20 +12,22 @@
 ## add signals of a file to a signal vector
 ##
 ## The file must contain two columns:
-##  Column 1: holds date and time in exactly the following form: "22.11.2013 13:15:30"
+##  Column 1: holds date and time
 ##  Column 2: holds the signal values
 ##
-## signal:    Vector with type 'Signal'
-## file:      filename as string
-## sensor:    a Sensor object
-## position:  Coordinates of the sensor, time is ignored
-## angle:     angle of sensor, optional
-## delim:     delimitation character
+## signal:      vector with type 'Signal'
+## file:        filename as string
+## sensor:      a Sensor object
+## position:    coordinates of the sensor, time is ignored
+## angle:       angle of sensor, optional
+## delim:       delimitation character of file
+## date_format: format string to parse dates and time
 
 function add_signal!(signals::Vector{Signal}, file::String,
                      sensor::Sensor,
                      position::Coor, angle::Float64=0.0;
-                     delim=',')
+                     delim::Char=',',
+                     date_format::String="d.m.yyyy HH:MM:SS")
 
     ## -----------
     ## read file
@@ -36,12 +38,7 @@ function add_signal!(signals::Vector{Signal}, file::String,
     ## add signals
 
     for i in 1:size(data,1)
-        ## convert time. Somewhat a hack, no proper parsing yet
-        t_string = data[i,1]
-        time = DateTime(int(t_string[7:10]), int(t_string[4:5]),
-                        int(t_string[1:2]), int(t_string[12:13]),
-                        int(t_string[15:16]), int(t_string[18:19]))
-
+        time = DateTime(data[i,1], date_format)
         new_signal = Signal(data[i, 2], sensor, Coor(position.x, position.y, time), angle)
         push!(signals, new_signal)
 

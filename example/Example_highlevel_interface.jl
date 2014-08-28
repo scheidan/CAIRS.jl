@@ -55,7 +55,7 @@ cov_GP = cov_exponential(sigma=10.0,           # standard deviation of GP
 
 ## Signals of every sensor must be in a separate file.
 ## The file must contain two columns:
-##  Column 1: holds date and time in *exactly* the following form: "22.11.2013 13:15:30"
+##  Column 1: holds date and time
 ##  Column 2: holds the signal values
 
 
@@ -68,13 +68,18 @@ path2 = joinpath(Pkg.dir("CAIRS"), "example", "data", "Sensor2.csv")
 add_signal!(sig,                        # add signal to vector 'sig'
             path1,                      # file name
             sensor_gauge,               # sensor
-            Coor(5, 6)                  # coordinate of the sensor
-            )                           # optional argument: delim=','
+            Coor(5, 6),                 # coordinate of the sensor
+            date_format="d.m.yyyy HH:MM:SS",
+            delim=',')                  # delimitation character
+
 
 add_signal!(sig, path2,
             sensor_MWL,                 # MWL link
             Coor(4.2, 2),               # coordinate of one end point of the sensor
-            0.9)                        # rotation around the point defined above in [rad]
+            0.9,                        # rotation around the point defined above in [rad]
+            date_format="d.m.yyyy HH:MM:SS",
+            delim=',')
+
 
 ## show details of a signal object
 show(sig[end])
