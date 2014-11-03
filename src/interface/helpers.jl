@@ -37,11 +37,11 @@ function summary2csv(pred_dict::Dict, filename="predictions.csv", real::Bool=tru
 
     n_coor = mapreduce(x -> typeof(x)==Coor, +, keys(pred_dict))
     predictions = Array(Float64, n_coor, 7)
-    
+
     for i in 1:n_coor
         coor = collect(keys(pred_dict))[i]
         if typeof(coor)==Coor
-            Rcoor = pred_dict[coor]       
+            Rcoor = pred_dict[coor]
             predictions[i,:] = [coor.x, coor.y, coor.time,
                           mean(Rcoor),
                           std(Rcoor),
@@ -65,15 +65,22 @@ function sensor2csv(signals::Vector, filename="sensors.csv")
 
     positions = Array(Any, 0, 4)
 
+    x = Float64[]
+    y = Float64[]
+    time = Float64[]
+    name = ASCIIString[]
+
     d = 1
     for sig in signals
 
         ## Coordinates
         if length(sig.sensor.delta_coor) > 0
-            for c in sig.sensor.delta_coor 
+            for c in sig.sensor.delta_coor
                 coor = sig.position + c
-                positions = [positions,
-                             [coor.x coor.y coor.time "coor"]]
+                push!(x, coor.x)
+                push!(y, coor.y)
+                push!(time, coor.time)
+                push!(name, "coor")
             end
         end
 
@@ -88,9 +95,11 @@ function sensor2csv(signals::Vector, filename="sensors.csv")
                                            sig.position.y + sig.sensor.domain_extent.y*b2,
                                            sig.position.time + sig.sensor.domain_extent.time*b3),
                                       sig.position, sig.angle)
-                        
-                        positions = [positions,
-                                     [coor.x coor.y coor.time "domain_$d"]]
+
+                        push!(x, coor.x)
+                        push!(y, coor.y)
+                        push!(time, coor.time)
+                        push!(name, "domain_$d")
                     end
                 end
             end
@@ -99,5 +108,5 @@ function sensor2csv(signals::Vector, filename="sensors.csv")
     end
 
     ## write file
-    writecsv(filename, positions)
+    writecsv(filename, [x y time name])
 end
