@@ -21,7 +21,8 @@ assimilated. Furthermore, _CAIRS_ is formulated continuously in time
 and space. This is helpful because it enables a natural consideration
 of signals with irregular time-intervals.
 
-For more information see [Scheidegger and Rieckermann (2014)](#publication).
+The mathematical model is described in [Scheidegger and Rieckermann (2014)](#publication). 
+The basic functionality and application is explained in [this tutorial](https://github.com/scheidan/CAIRS-Tutorial).
 
 Note, _CAIRS_ is still under development and the interface may change.
 
