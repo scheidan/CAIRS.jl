@@ -110,7 +110,7 @@ mean, and a separable gamma-exponential covariance function. Only the
 parameters must be provided:
 
 ```Julia
-mean_GP = mean_constant(mean=2)
+mean_GP = mean_constant(mean=2.0)
 
 cov_GP = cov_exponential(sigma=10.0,           # standard deviation of GP
                          l_spatial=1.5,        # spatial correlation length
@@ -186,7 +186,7 @@ R_pred = predict(loc_pred,               # vector or array with locations for pr
                  n_sample_calib = 20000, # number of iterations of the Gibbs sampler
                  burn_in = 5000,         # number of removed samples (and length of adaptation)
                  n_sample_pred = 6000,   # number of samples for predictions
-                 delta = seconds(90))    # consider all signals within time 'delta'
+                 delta = Second(90))     # consider all signals within time 'delta'
                                          # from prediction points
 ```
 
