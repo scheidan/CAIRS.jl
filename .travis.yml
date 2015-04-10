@@ -1,17 +1,16 @@
-language: cpp
-compiler:
-  - clang
+language: julia
+os:
+  - linux
+  - osx
+julia:
+  - release
+#  - nightly
 notifications:
   email: false
-before_install:
-  - sudo add-apt-repository ppa:staticfloat/julia-deps -y
-  - sudo add-apt-repository ppa:staticfloat/julianightlies -y
-  - sudo apt-get update -qq -y
-  - sudo apt-get install libpcre3-dev julia -y
 script:
-  - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("CAIRS"))`); Pkg.pin("CAIRS"); Pkg.resolve()'
-  - julia -e 'using CAIRS; @assert isdefined(:CAIRS); @assert typeof(CAIRS) === Module'
-  - julia --code-coverage ./test/tests.jl
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - julia --check-bounds=yes -e 'Pkg.clone(pwd()); Pkg.build("CAIRS"); Pkg.test("CAIRS"; coverage=true)'
   - grep -v Rscript  ./example/Example_highlevel_interface.jl > example_without_R.jl
   - julia --code-coverage ./example_without_R.jl
+after_success:
   - julia -e 'cd(Pkg.dir("CAIRS")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
