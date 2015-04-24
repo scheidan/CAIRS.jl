@@ -190,7 +190,7 @@ function make_cov{T1<:Location, T2<:Location}(loc_1::Vector{T1}, loc_2::Vector{T
         ## for symmetric matrices
         n = length(loc_1)
         Sigma = zeros(n, n)
-        for j in 1:n
+        @inbounds for j in 1:n
             for i in j:n
                 if i !=j
                     Sigma[i,j] = Sigma[j,i] = f_cov(loc_1[i], loc_2[j])
