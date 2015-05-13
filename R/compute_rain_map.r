@@ -14,10 +14,17 @@ file.rain <- args[1]
 file.sensor.pos <- args[2]
 output.name <- args[3]
 
+## function load and install packages if necessary
+load.and.install.packages <- function(packages) {
+  for(p in packages){
+    if(!require(p, character.only=TRUE)){
+      install.packages(p, repos="http://cran.rstudio.com/")
+      require(p, character.only=TRUE)
+    }
+  }
+}
 
-library(lattice)
-library(latticeExtra)
-library(tripack)
+load.and.install.packages(c("lattice", "latticeExtra", "tripack"))
 
 
 ## -----------
