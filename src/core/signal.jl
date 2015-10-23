@@ -80,8 +80,8 @@ function find_near_signals(loc_pred::Vector, signals::Vector, delta::Real)
     ## Find signals that are within (tmin, tmax)
     signals_near = Signal[]
     for sig in signals
-        t = [sig.position.time,
-             (sig.position + sig.sensor.domain_extent).time,
+        t = [sig.position.time;
+             (sig.position + sig.sensor.domain_extent).time;
              [(sig.position + i).time for i in sig.sensor.delta_coor]]
 
         if any(t .< tmax) && any(t .> tmin)

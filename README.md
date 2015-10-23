@@ -21,7 +21,7 @@ assimilated. Furthermore, _CAIRS_ is formulated continuously in time
 and space. This is helpful because it enables a natural consideration
 of signals with irregular time-intervals.
 
-The mathematical model is described in [Scheidegger and Rieckermann (2014)](#publication). 
+The mathematical model is described in [Scheidegger and Rieckermann (2014)](#publication).
 The basic functionality and application is explained in [this tutorial](https://github.com/scheidan/CAIRS-Tutorial).
 
 Note, _CAIRS_ is still under development and the interface may change.
@@ -31,7 +31,7 @@ Note, _CAIRS_ is still under development and the interface may change.
 # Installation
 
 _CAIRS_ is a [Julia](http://julialang.org/) package. The first step is to download and install
-Julia, version >= 0.3 (http://julialang.org/downloads/).
+Julia, version >= 0.4 (http://julialang.org/downloads/).
 
 _CAIRS_ can then be installed with the Julia command `Pkg.clone()`:
 

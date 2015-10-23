@@ -38,7 +38,7 @@ function sample_preditions{T<:Location}(loc_pred::Vector{T},
 
     ## number of blocks
     block_size == Inf ? block_size = size(loc_pred,1) : nothing # only one block
-    n_blocks = iceil(size(loc_pred,1)/block_size)
+    n_blocks = ceil(Integer, size(loc_pred,1)/block_size)
 
     ## initialize empty dict
     R_dict_pred = Dict{Location,Vector{Float64}}()
@@ -111,7 +111,7 @@ function sample_preditions_block{T<:Location}(loc_pred::Vector{T},
 
     ## Sigma_cond = Sigma_pp - Sigma_pc * inv(Sigma) * Sigma_pc'
     Sigma_cond = Sigma_pp - PDMats.X_invA_Xt(Sigma_cc, Sigma_pc)
-    Sigma_cond_chol = chol(Sigma_cond, :L)
+    Sigma_cond_chol = chol(Sigma_cond, Val{:L})
 
     ## number of sample in R_dict_cal
     n_calib = length(collect(values(R_dict_cal))[1])

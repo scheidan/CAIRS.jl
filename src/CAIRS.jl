@@ -14,8 +14,10 @@ module CAIRS
 
 ## using Distibutions
 using Cubature
-using Dates
 import PDMats
+
+import Base.+
+import Base.-
 
 ## -----------
 ## Define constantes

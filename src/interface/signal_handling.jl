@@ -23,11 +23,11 @@
 ## delim:       delimitation character of file
 ## date_format: format string to parse dates and time
 
-function add_signal!(signals::Vector{Signal}, file::String,
+function add_signal!(signals::Vector{Signal}, file::AbstractString,
                      sensor::Sensor,
                      position::Coor, angle::Float64=0.0;
                      delim::Char=',',
-                     date_format::String="d.m.yyyy HH:MM:SS")
+                     date_format::AbstractString="d.m.yyyy HH:MM:SS")
 
     ## -----------
     ## read file
