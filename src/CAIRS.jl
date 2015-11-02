@@ -14,6 +14,8 @@ module CAIRS
 
 ## using Distibutions
 using Cubature
+using Base.Dates
+
 import PDMats
 
 import Base.+

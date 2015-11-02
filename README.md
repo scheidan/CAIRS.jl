@@ -50,8 +50,8 @@ recommended to load the packages `Dates` and `Distributions`:
 
 ```Julia
 using CAIRS
-using Dates
 using Distributions
+using Base.Dates
 ```
 
 
@@ -64,12 +64,12 @@ distribution must be defined conditioned on the intesity at this coordinate:
 ```Julia
 function log_p_gauge(S::Float64, R::Vector) # non-linear continuous rain gauge
 
-    mu = 0.1+R[1]^2.0    # Note, the signal and can be non-linearly
-                         # related to the rain intensity.
-    sigma = 0.005
+	mu = 0.1+R[1]^2.0    # Note, the signal and can be non-linearly
+						 # related to the rain intensity.
+	sigma = 0.005
 
-     ## log of normal density, p(S|R)
-    logpdf(Normal(mu, sigma), S)   # doesn't have to be normal
+	 ## log of normal density, p(S|R)
+	logpdf(Normal(mu, sigma), S)   # doesn't have to be normal
 end
 
 sensor_gauge = Sensor(log_p_gauge)
@@ -82,11 +82,11 @@ defined as:
 ```julia
 function log_p_MWL(S::Float64, I::Float64)
 
-    R_mean = I/6.0
-    sigma = 0.1
+	R_mean = I/6.0
+	sigma = 0.1
 
-    ## log of normal density, p(S|I)
-    logpdf(Normal(R_mean, sigma), S)
+	## log of normal density, p(S|I)
+	logpdf(Normal(R_mean, sigma), S)
 end
 
 sensor_MWL = Sensor(log_p_MWL, Coor(6, 0, 0)) # integrates along a path of length 6
@@ -113,9 +113,9 @@ parameters must be provided:
 mean_GP = mean_constant(mean=2.0)
 
 cov_GP = cov_exponential(sigma=10.0,           # standard deviation of GP
-                         l_spatial=1.5,        # spatial correlation length
-                         l_temporal=Minute(1), # temporal correlation length
-                         gamma=1.0)            # exponent for smoothness in [0, 2]
+						 l_spatial=1.5,        # spatial correlation length
+						 l_temporal=Minute(1), # temporal correlation length
+						 gamma=1.0)            # exponent for smoothness in [0, 2]
 ```
 Other types of covariance functions will be added in future.
 
@@ -139,19 +139,19 @@ path2 = joinpath(Pkg.dir("CAIRS"), "example", "data", "Sensor2.csv")
 sig = Signal[]                          # create an empty array for Signals
 
 add_signal!(sig,                        # add signal to vector 'sig'
-            path1,                      # file name
-            sensor_gauge,               # sensor
-            Coor(5, 6),                 # coordinate of the sensor
-            date_format="d.m.yyyy HH:MM:SS",
-            delim=',')                  # delimitation character
+			path1,                      # file name
+			sensor_gauge,               # sensor
+			Coor(5, 6),                 # coordinate of the sensor
+			date_format="d.m.yyyy HH:MM:SS",
+			delim=',')                  # delimitation character
 
 
 add_signal!(sig, path2,
-            sensor_MWL,                 # MWL link
-            Coor(4.2, 2),               # coordinate of one end point of the sensor
-            0.9,                        # rotation around the point defined above in [rad]
-            date_format="d.m.yyyy HH:MM:SS",
-            delim=',')
+			sensor_MWL,                 # MWL link
+			Coor(4.2, 2),               # coordinate of one end point of the sensor
+			0.9,                        # rotation around the point defined above in [rad]
+			date_format="d.m.yyyy HH:MM:SS",
+			delim=',')
 ```
 
 Information about a signal can be printed with `show`, e.g. `show(sig[1])`.
@@ -171,8 +171,8 @@ object.
 ### create a simple grid
 nn = 20
 loc_pred = [Coor(i, j, time)
-            for i=linspace(0, 10, nn), j=linspace(0, 10, nn),
-            time=DateTime(2013, 11, 22, 13, 15, 00) : Minute(1): DateTime(2013, 11, 22, 13, 20, 00) ]
+			for i=linspace(0, 10, nn), j=linspace(0, 10, nn),
+			time=DateTime(2013, 11, 22, 13, 15, 00) : Minute(1): DateTime(2013, 11, 22, 13, 20, 00) ]
 ```
 This produced a regular grid, but the point could also be irregularly distributed. Also, not only predictions for coordinates but also for intesities integrated over a domain can be made. Domains are defined by the function `Domain`.
 
@@ -180,14 +180,14 @@ This produced a regular grid, but the point could also be irregularly distribute
 The assimilation of the signals and the computation of the predictions are done with `predict`.
 ```Julia
 R_pred = predict(loc_pred,               # vector or array with locations for predictions
-                 sig,                    # vector of signals
-                 mean_GP,                # mean function of prior
-                 cov_GP,                 # covariance function of prior
-                 n_sample_calib = 20000, # number of iterations of the Gibbs sampler
-                 burn_in = 5000,         # number of removed samples (and length of adaptation)
-                 n_sample_pred = 6000,   # number of samples for predictions
-                 delta = Second(90))     # consider all signals within time 'delta'
-                                         # from prediction points
+				 sig,                    # vector of signals
+				 mean_GP,                # mean function of prior
+				 cov_GP,                 # covariance function of prior
+				 n_sample_calib = 20000, # number of iterations of the Gibbs sampler
+				 burn_in = 5000,         # number of removed samples (and length of adaptation)
+				 n_sample_pred = 6000,   # number of samples for predictions
+				 delta = Second(90))     # consider all signals within time 'delta'
+										 # from prediction points
 ```
 
 Write a summary of the samples in a file that is used for visualization:
