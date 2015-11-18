@@ -6,6 +6,7 @@
 ## Andreas Scheidegger -- andreas.scheidegger@eawag.ch
 ## =======================================================
 
+VERSION >= v"0.4" && __precompile__()
 
 ## ---------------------------------
 ## Core module with low-level interface
