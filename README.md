@@ -3,7 +3,10 @@
 
 ![rain map](https://raw.github.com/scheidan/CAIRS/master/Images%20for%20Readme/Header.png)
 
+Linux, OS X:
 [![Build Status](https://travis-ci.org/scheidan/CAIRS.jl.svg?branch=master)](https://travis-ci.org/scheidan/CAIRS.jl)
+  Windows:
+[![Build status](https://ci.appveyor.com/api/projects/status/9cuvjuek83wut0ju/branch/master?svg=true)](https://ci.appveyor.com/project/scheidan/cairs-jl/branch/master)
 [![Coverage Status](https://img.shields.io/coveralls/scheidan/CAIRS.jl.svg)](https://coveralls.io/r/scheidan/CAIRS.jl?branch=master)
 
 _CAIRS_ is a framework to reconstruct rain fields by assimilating
