@@ -129,7 +129,7 @@ summary2csv(R_pred, "rain_field.csv")
 ## the R-libraries 'lattice', 'latticeExtra' and 'tripack' must be
 ## installed.
 
-pathRscript = joinpath(Pkg.dir("CAIRS"), "R", "compute_rain_map.r")
-run(`Rscript $pathRscript  rain_field.csv sensor_coor.csv out.pdf`)
+# pathRscript = joinpath(Pkg.dir("CAIRS"), "R", "compute_rain_map.r")
+# run(`Rscript $pathRscript  rain_field.csv sensor_coor.csv out.pdf`)
 
 ## here it is assumed that 'Rscript' is in PATH.

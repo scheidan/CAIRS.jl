@@ -9,6 +9,11 @@
 using Base.Test
 using CAIRS
 
+## Run example script
+
+module examtest
+include(joinpath(Pkg.dir("CAIRS"), "example", "Example_highlevel_interface.jl"))
+end
 
 ## Coordinates
 
