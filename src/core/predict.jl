@@ -111,7 +111,8 @@ function sample_preditions_block{T<:Location}(loc_pred::Vector{T},
 
     ## Sigma_cond = Sigma_pp - Sigma_pc * inv(Sigma) * Sigma_pc'
     Sigma_cond = Sigma_pp - PDMats.X_invA_Xt(Sigma_cc, Sigma_pc)
-    Sigma_cond_chol = chol(Sigma_cond, Val{:L})
+    Sigma_cond_chol = ctranspose(chol(Sigma_cond))
+
 
     ## number of sample in R_dict_cal
     n_calib = length(collect(values(R_dict_cal))[1])

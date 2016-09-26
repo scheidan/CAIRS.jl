@@ -34,7 +34,7 @@ Note, _CAIRS_ is still under development and the interface may change.
 # Installation
 
 _CAIRS_ is a [Julia](http://julialang.org/) package. The first step is to download and install
-[Julia](http://julialang.org/downloads/) version 0.4 or newer.
+[Julia](http://julialang.org/downloads/) version 0.5 or newer.
 
 _CAIRS_ can then be installed with the Julia command `Pkg.clone()`:
 

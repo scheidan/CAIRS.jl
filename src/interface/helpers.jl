@@ -68,7 +68,7 @@ function sensor2csv(signals::Vector, filename="sensors.csv")
     x = Float64[]
     y = Float64[]
     time = Float64[]
-    name = ASCIIString[]
+    name = String[]
 
     d = 1
     for sig in signals

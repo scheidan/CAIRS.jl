@@ -173,7 +173,7 @@ function Gibbs{T<:Signal}(signals::Vector{T},
 
     ## sd of jump distributions
     sd_prior = sqrt(diag(Sigma))
-    sd_prop = [collect(keys(samples_dict))[ii] => sd_prior[ii] for ii in 1:length(samples_dict)]
+    sd_prop = Dict(collect(keys(samples_dict))[ii] => sd_prior[ii] for ii in 1:length(samples_dict))
 
     ## -----------
     ## 2) sampling
