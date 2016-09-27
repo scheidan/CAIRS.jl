@@ -36,22 +36,26 @@ end
 ## end
 
 
-
-
 ## --- derive other transformation functions
 
-## vectorized version for arrays and Dicts
-trans2real(R::Vector{Float64}) = map(trans2real, R)
-trans2real(R::Dict{Location, Vector{Float64}}) = map(trans2real, values(R), keys(R))
-
-trans2real(R::Float64, c::Coor) = trans2real(R)
-
 ## N.B. this fucntions needs tuning!!!
-function trans2real(I::Float64, d::Domain)
+function trans2real(I, d::Domain)
     scale = 1.5
     vol = volume(d)                     # 'volume of Domain'
     scale * trans2real(I/vol)*vol
 end
+
+
+trans2real(R, c::Coor) = trans2real(R)
+trans2real(R::Vector{Float64}) = map(trans2real, R)
+
+function trans2real!(R::Dict{Location, Vector{Float64}})
+    for k in keys(R)
+        R[k] = trans2real(R[k], k)
+    end
+end
+
+
 
 
 ## ---------------------------------

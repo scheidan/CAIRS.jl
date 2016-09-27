@@ -18,7 +18,7 @@
 ## block_size:  number of sample points per block.
 ##
 ## Note:
-## If 'block_size' is small as the number of prediction
+## If 'block_size' is smaller as the number of prediction
 ## locations, only marginals are sampled, i.e. not all dependecies are
 ## visible in the sample!  Set to 'Inf' to sample a realization of the
 ## rain field (might be much slower).
@@ -72,6 +72,7 @@ function sample_preditions{T<:Location}(loc_pred::Vector{T},
         end
     end
 
+    trans2real!(R_dict_pred)
     return(R_dict_pred)
 end
 
