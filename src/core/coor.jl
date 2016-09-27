@@ -66,3 +66,16 @@ immutable Domain <: Location
     extend::Coor                    # extend relative to position, before rotation
     angle::Float64                  # angle, rotated around 'position'
 end
+
+function volume(d::Domain)
+
+    if d.extend == Coor(0,0,0)
+        return(0.0)
+    else
+        x = ones(3)
+        x[1] = d.extend.x != 0.0 ? d.extend.x : 1.0
+        x[2] = d.extend.y != 0.0 ? d.extend.y : 1.0
+        x[3] = d.extend.time != 0.0 ? d.extend.time : 1.0
+        return(abs(prod(x)))
+    end
+end
