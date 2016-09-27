@@ -115,13 +115,13 @@ function log_p_of_signal(S::Signal, sample_dict::Dict{Location, Vector{Float64}}
 
     ## compute log_p
     if S.sensor.domain_extent == Coor(0.0, 0.0, 0.0) # no domain
-        log_p = S.sensor.log_p(S.signal, R)
+        log_p = S.sensor.log_p(S.signal, trans2real(R))
     end
     if size(S.sensor.delta_coor,1) ==  0 # no coordiantes
-        log_p = S.sensor.log_p(S.signal, I)
+        log_p = S.sensor.log_p(S.signal, trans2real(I, S.sensor.domain_extent))
     end
     if (S.sensor.domain_extent != Coor(0.0, 0.0, 0.0)) && (size(S.sensor.delta_coor,1) > 0)
-        log_p = S.sensor.log_p(S.signal, R, I)
+        log_p = S.sensor.log_p(S.signal, trans2real(R), trans2real(I, S.sensor.domain_extent))
     end
     return(log_p)
 end

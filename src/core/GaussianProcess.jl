@@ -13,43 +13,46 @@
 ## if X~N(0,1), g(X) should have a realistic rain distibution
 
 ## exponential with offset
-## function trans2real(R_trans::Float64)
-##     k = 0.8
-##     offset = 1.5
-##     R_trans <= offset ? 0 : exp(k*(R_trans-offset)) - 1.0
-## end
+function trans2real(R::Float64)
+    k = 1.5
+    k^R
+end
 
 ## ## power law with limitation and offset
-## function trans2real(R_trans::Float64)
+## function trans2real(R::Float64)
 ##     k = 2.0
 ##     offset = 1.8
 ##     a = 3.5
-##     if R_trans <= offset
+##     if R <= offset
 ##         return(0.0)
 ##     else
-##         if(R_trans < a)
-##             return( (R_trans-offset)^k )
+##         if(R < a)
+##             return( (R-offset)^k )
 ##         else
 ##             slope = k*(a-offset)^(k-1)
-##             return( (R_trans-a)*slope + (a-offset)^k )
+##             return( (R-a)*slope + (a-offset)^k )
 ##         end
 ##     end
 ## end
 
-## ## no transformation
-## function trans2real(R_trans::Float64)
-##    R_trans
-## end
 
-## ## vectorized version
-## function trans2real(R_trans::Vector{Float64})
-##     n = size(R_trans,1)
-##     R_real = zeros(n)
-##     for i in 1:n
-##         R_real[i] = trans2real(R_trans[i])
-##     end
-##     return(R_real)
-## end
+
+
+## --- derive other transformation functions
+
+## vectorized version for arrays and Dicts
+trans2real(R::Vector{Float64}) = map(trans2real, R)
+trans2real(R::Dict{Location, Vector{Float64}}) = map(trans2real, values(R), keys(R))
+
+trans2real(R::Float64, c::Coor) = trans2real(R)
+
+## N.B. this fucntions needs tuning!!!
+function trans2real(I::Float64, d::Domain)
+    scale = 1.5
+    vol = volume(d)                     # 'volume of Domain'
+    scale * trans2real(I/vol)*vol
+end
+
 
 ## ---------------------------------
 ## function that construct overloaded mean and covariance functions
@@ -57,10 +60,10 @@
 function overload_GP_function(f_mean::Function, f_covariance::Function)
 
     !method_exists(f_mean, (Coor,)) ?
-    error("The mean function of the GP must provide a method for arguments of type 'Coor'!") : nothing
+        error("The mean function of the GP must provide a method for arguments of type 'Coor'!") : nothing
 
     !method_exists(f_covariance, (Coor,Coor)) ?
-    error("The covariance function of the GP must provide a method for both arguments of type 'Coor'!") : nothing
+        error("The covariance function of the GP must provide a method for both arguments of type 'Coor'!") : nothing
 
     ## ---------------------------------
     ## mean function
@@ -182,7 +185,7 @@ end
 
 
 function make_cov{T1<:Location, T2<:Location}(loc_1::Vector{T1}, loc_2::Vector{T2},
-                  f_cov::Function)
+                                              f_cov::Function)
     ## if asymmetric
     if loc_1 != loc_2
         Sigma = Float64[f_cov(l1, l2) for l1 in loc_1, l2 in loc_2]
@@ -212,9 +215,9 @@ end
 ## proportional to joint density p(R1, R2, ..., Rn, I1, I2, ...)
 
 function log_p_prior{T<:Location}(locations::Vector{T}, Samp_dict::Dict{Location, Vector{Float64}},
-                     i_sample::Int,
-                     mu::Vector{Float64},
-                     Sigma::PDMats.AbstractPDMat)
+                                  i_sample::Int,
+                                  mu::Vector{Float64},
+                                  Sigma::PDMats.AbstractPDMat)
 
     ## get rain at all locations
     R = Float64[]
