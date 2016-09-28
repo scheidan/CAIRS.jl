@@ -40,16 +40,16 @@ end
 
 ## N.B. this fucntions needs tuning!!!
 function trans2real(I, d::Domain)
-    scale = 1.5
+    scale = 2.5
     vol = volume(d)                     # 'volume of Domain'
     scale * trans2real(I/vol)*vol
 end
 
 
 trans2real(R, c::Coor) = trans2real(R)
-trans2real(R::Vector{Float64}) = map(trans2real, R)
+trans2real(R::Vector) = map(trans2real, R)
 
-function trans2real!(R::Dict{Location, Vector{Float64}})
+function trans2real!(R::Dict{Location, Vector{Float64}}) # N.B. slow?
     for k in keys(R)
         R[k] = trans2real(R[k], k)
     end

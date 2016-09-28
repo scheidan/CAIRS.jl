@@ -43,10 +43,10 @@ function summary2csv(pred_dict::Dict, filename="predictions.csv", real::Bool=tru
         if typeof(coor)==Coor
             Rcoor = pred_dict[coor]
             predictions[i,:] = [coor.x, coor.y, coor.time,
-                          mean(Rcoor),
-                          std(Rcoor),
-                          quantile(Rcoor, 0.1),
-                          quantile(Rcoor, 0.9)]'
+                                mean(Rcoor), # quantile(Rcoor, 0.5),
+                                std(Rcoor),
+                                quantile(Rcoor, 0.1),
+                                quantile(Rcoor, 0.9)]'
         end
     end
 

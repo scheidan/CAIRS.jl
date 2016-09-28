@@ -44,7 +44,7 @@ sensor_MWL = Sensor(log_p_MWL, Coor(6, 0, 0)) # integrates along a path of lengt
 
 mean_GP = mean_constant(mean=2.0)
 
-cov_GP = cov_exponential(sigma=10.0,           # standard deviation of GP
+cov_GP = cov_exponential(sigma=1.0,           # standard deviation of GP
                          l_spatial=1.5,        # spatial correlation length
                          l_temporal=Minute(1), # temporal correlation length
                          gamma=1.0)           # exponent for smoothness in [0, 2]
@@ -107,14 +107,14 @@ loc_pred = [Coor(i, j, time)
 ## Compute predictions
 
 @time R_pred = predict(loc_pred,               # vector or array with locations for predictions
-                 sig,                    # vector of signals
-                 mean_GP,                # mean function of prior
-                 cov_GP,                 # covariance function of prior
-                 n_sample_calib = 20000, # number of iterations of the Gibbs sampler
-                 burn_in = 5000,         # number of removed samples (and length of adaptation)
-                 n_sample_pred = 6000,   # number of samples for predictions
-                 delta = Second(90))    # consider all signals within time 'delta'
-                                         #  from prediction points
+                       sig,                    # vector of signals
+                       mean_GP,                # mean function of prior
+                       cov_GP,                 # covariance function of prior
+                       n_sample_calib = 20000, # number of iterations of the Gibbs sampler
+                       burn_in = 5000,         # number of removed samples (and length of adaptation)
+                       n_sample_pred = 6000,   # number of samples for predictions
+                       delta = Second(90))    # consider all signals within time 'delta'
+#  from prediction points
 
 
 ## compute summary of samples and save in file
@@ -129,7 +129,7 @@ summary2csv(R_pred, "rain_field.csv")
 ## the R-libraries 'lattice', 'latticeExtra' and 'tripack' must be
 ## installed.
 
-# pathRscript = joinpath(Pkg.dir("CAIRS"), "R", "compute_rain_map.r")
-# run(`Rscript $pathRscript  rain_field.csv sensor_coor.csv out.pdf`)
+## pathRscript = joinpath(Pkg.dir("CAIRS"), "R", "compute_rain_map.r")
+## run(`Rscript $pathRscript  rain_field.csv sensor_coor.csv out.pdf`)
 
 ## here it is assumed that 'Rscript' is in PATH.
