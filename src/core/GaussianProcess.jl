@@ -18,43 +18,28 @@ function trans2real(R::Float64)
     k^R
 end
 
-## ## power law with limitation and offset
-## function trans2real(R::Float64)
-##     k = 2.0
-##     offset = 1.8
-##     a = 3.5
-##     if R <= offset
-##         return(0.0)
-##     else
-##         if(R < a)
-##             return( (R-offset)^k )
-##         else
-##             slope = k*(a-offset)^(k-1)
-##             return( (R-a)*slope + (a-offset)^k )
-##         end
-##     end
-## end
-
-
-## --- derive other transformation functions
-
-## N.B. this fucntions needs tuning!!!
-function trans2real(I, d::Domain)
-    scale = 2.5
-    vol = volume(d)                     # 'volume of Domain'
+## N.B. this functions needs tuning!!!
+function transI2real(I::Float64, c::Coor)
+    scale = 1.1
+    vol = volume(Domain(Coor(0,0,0), c, 0.0))                     # 'volume of Domain'
     scale * trans2real(I/vol)*vol
 end
 
 
-trans2real(R, c::Coor) = trans2real(R)
+## --- derive other transformation functions
+
 trans2real(R::Vector) = map(trans2real, R)
+transI2real(R::Vector, c::Coor) = broadcast(transI2real, R, c)
 
 function trans2real!(R::Dict{Location, Vector{Float64}}) # N.B. slow?
     for k in keys(R)
-        R[k] = trans2real(R[k], k)
+        if typeof(k) == Coor    # ugly, can't we solve this with multible dispatch?
+            R[k] = trans2real(R[k])
+        else
+            R[k] = transI2real(R[k], k.extend)
+        end
     end
 end
-
 
 
 
