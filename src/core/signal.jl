@@ -9,7 +9,7 @@
 ## ---------------------------------
 ## define type Signal
 
-immutable Signal{T}
+struct Signal{T}
     ## signal obtained by sensor
     signal::T
 

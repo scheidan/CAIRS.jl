@@ -7,9 +7,9 @@
 ## =======================================================
 
 ## ---------------------------------
-## define type Sensor
+## define Sensor
 
-immutable Sensor
+struct Sensor
     ## function that computes log p(S| [R_1 ,... R_n], I)
     ## must take a signal S and an array of *not transformed* rain
     log_p::Function
@@ -54,7 +54,7 @@ function show(sensor::Sensor, offset=""::String)
             println(offset, "   ", coor)
         end
     end
-    
+
     if sensor.domain_extent != Coor(0.0, 0.0, 0.0)
         println(offset, "- integration domain: $(sensor.domain_extent)")
     else

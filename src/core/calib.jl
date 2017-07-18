@@ -172,7 +172,7 @@ function Gibbs{T<:Signal}(signals::Vector{T},
     Sigma = PDMats.PDMat(make_cov(samp_points, samp_points, f_cov))
 
     ## sd of jump distributions
-    sd_prior = sqrt(diag(Sigma))
+    sd_prior = sqrt.(diag(Sigma))
     sd_prop = Dict(collect(keys(samples_dict))[ii] => sd_prior[ii] for ii in 1:length(samples_dict))
 
     ## -----------

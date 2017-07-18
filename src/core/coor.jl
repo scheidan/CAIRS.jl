@@ -10,13 +10,15 @@
 ## ---------------------------------
 ## define a Super Type for Type 'Coor' and 'Domain'
 
-abstract Location
+abstract type
+    Location
+end
 
 
 ## ---------------------------------
 ## define type 'Coor' to hold coordinates
 
-immutable Coor <: Location
+struct Coor <: Location
     x::Float64
     y::Float64
     time::Float64
@@ -61,7 +63,7 @@ end
 ## ---------------------------------
 ## define type 'Domain'
 
-immutable Domain <: Location
+struct Domain <: Location
     position::Coor
     extend::Coor                    # extend relative to position, before rotation
     angle::Float64                  # angle, rotated around 'position'

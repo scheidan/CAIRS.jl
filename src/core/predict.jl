@@ -119,7 +119,7 @@ function sample_preditions_block{T<:Location}(loc_pred::Vector{T},
     n_pred = size(loc_pred, 1)
 
     ## Array to store the samples temporary
-    R_array_pred = Array(Float64, n_samples, n_pred)
+    R_array_pred = Array{Float64}(n_samples, n_pred)
 
     for i in 1:n_samples
 
