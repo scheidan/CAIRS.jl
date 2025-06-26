@@ -136,8 +136,9 @@ stored in a separate file. The file must contain two columns:
 
 ```julia
 ## path to example data that come with the CAIRS package
-path1 = joinpath(Pkg.dir("CAIRS"), "example", "data", "Sensor1.csv")
-path2 = joinpath(Pkg.dir("CAIRS"), "example", "data", "Sensor2.csv")
+root = dirname(dirname(pathof(CAIRS)))
+path1 = joinpath(root, "example", "data", "Sensor1.csv")
+path2 = joinpath(root, "example", "data", "Sensor2.csv")
 
 sig = Signal[]                          # create an empty array for Signals
 
@@ -174,8 +175,8 @@ object.
 ### create a simple grid
 nn = 20
 loc_pred = [Coor(i, j, time)
-			for i=linspace(0, 10, nn), j=linspace(0, 10, nn),
-			time=DateTime(2013, 11, 22, 13, 15, 00) : Minute(1): DateTime(2013, 11, 22, 13, 20, 00) ]
+                        for i in range(0, stop=10, length=nn), j in range(0, stop=10, length=nn),
+                        time=DateTime(2013, 11, 22, 13, 15, 00) : Minute(1): DateTime(2013, 11, 22, 13, 20, 00) ]
 ```
 This produced a regular grid, but the point could also be irregularly distributed. Also, not only predictions for coordinates but also for intesities integrated over a domain can be made. Domains are defined by the function `Domain`.
 
@@ -203,7 +204,7 @@ One possibility to visualize the result is to use [R](http://www.r-project.org/)
 R-script to produce rain maps comes with _CAIRE_. It requires that R and
 the R-libraries `lattice`, `latticeExtra` and `tripack` are installed.
 ```Julia
-pathRscript = joinpath(Pkg.dir("CAIRS"), "R", "compute_rain_map.r")
+pathRscript = joinpath(root, "R", "compute_rain_map.r")
 run(`Rscript $pathRscript  rain_field.csv sensor_coor.csv out.pdf`)
 ```
 Note, here it is assumed that `Rscript` is in PATH.

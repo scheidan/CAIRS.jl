@@ -181,8 +181,8 @@ end
 ## construct covariance matrix
 
 
-function make_cov{T1<:Location, T2<:Location}(loc_1::Vector{T1}, loc_2::Vector{T2},
-                  f_cov::Function)
+function make_cov(loc_1::Vector{T1}, loc_2::Vector{T2},
+                  f_cov::Function) where {T1<:Location, T2<:Location}
     ## if asymmetric
     if loc_1 != loc_2
         Sigma = Float64[f_cov(l1, l2) for l1 in loc_1, l2 in loc_2]
@@ -211,10 +211,10 @@ end
 ## ---------------------------------
 ## proportional to joint density p(R1, R2, ..., Rn, I1, I2, ...)
 
-function log_p_prior{T<:Location}(locations::Vector{T}, Samp_dict::Dict{Location, Vector{Float64}},
+function log_p_prior(locations::Vector{T}, Samp_dict::Dict{Location, Vector{Float64}},
                      i_sample::Int,
                      mu::Vector{Float64},
-                     Sigma::PDMats.AbstractPDMat)
+                     Sigma::PDMats.AbstractPDMat) where {T<:Location}
 
     ## get rain at all locations
     R = Float64[]
