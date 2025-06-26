@@ -7,12 +7,13 @@ authors = ["Andreas Scheidegger"]
 julia = "1.9"
 
 [deps]
-HCubature = "1e6163b2-abe8-52f2-ae03-e4d7288c1f75"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+HCubature = "19dc6840-f33b-545b-b366-655c7e3ffd49"
 PDMats = "90014a1f-27ba-587c-ab20-58faa44d9150"
 
+
 [extras]
-Test = "8dfed614-e22c-5e08-8112-4fa2f6e7b772"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["Test"]
