@@ -8,6 +8,7 @@
 
 using Test
 using CAIRS
+using Dates
 
 ## Run example script
 
