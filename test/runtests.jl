@@ -6,13 +6,13 @@
 ## Andreas Scheidegger -- andreas.scheidegger@eawag.ch
 ## =======================================================
 
-using Base.Test
+using Test
 using CAIRS
 
 ## Run example script
 
 module examtest
-include(joinpath(Pkg.dir("CAIRS"), "example", "Example_highlevel_interface.jl"))
+include(joinpath(dirname(dirname(pathof(CAIRS))), "example", "Example_highlevel_interface.jl"))
 end
 
 ## Coordinates

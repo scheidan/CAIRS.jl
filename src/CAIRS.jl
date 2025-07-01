@@ -6,7 +6,7 @@
 ## Andreas Scheidegger -- andreas.scheidegger@eawag.ch
 ## =======================================================
 
-VERSION >= v"0.4" && __precompile__()
+__precompile__()
 
 ## ---------------------------------
 ## Core module with low-level interface
@@ -14,7 +14,7 @@ VERSION >= v"0.4" && __precompile__()
 module CAIRS
 
 ## using Distibutions
-using Cubature
+using HCubature
 using Base.Dates
 
 import PDMats

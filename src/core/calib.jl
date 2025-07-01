@@ -15,7 +15,7 @@
 
 ## signals:    vector of Signals
 
-function make_signal_dict{T<:Signal}(signals::Vector{T})
+function make_signal_dict(signals::Vector{T}) where {T<:Signal}
 
     ## create empty dictionary
     Dic = Dict{Location, Vector{Signal}}()
@@ -144,10 +144,10 @@ end
 ##         - adaptive rejection sampling (http://www.stat.duke.edu/~cnk/Links/slides.pdf)?
 ##         - slice sampling?
 
-function Gibbs{T<:Signal}(signals::Vector{T},
+function Gibbs(signals::Vector{T},
                           prior_mean::Function, prior_cov::Function,
                           n_samples::Int, burn_in::Int=0;
-                          adaption::Bool=true)
+                          adaption::Bool=true) where {T<:Signal}
 
     ## -----------
     ## 1) set-up
