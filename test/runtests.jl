@@ -11,10 +11,7 @@ using CAIRS
 using Dates
 
 ## Run example script
-
-module examtest
-include(joinpath(dirname(dirname(pathof(CAIRS))), "example", "Example_highlevel_interface.jl"))
-end
+include(joinpath(pkgdir(CAIRS), "example", "Example_highlevel_interface.jl"))
 
 ## Coordinates
 

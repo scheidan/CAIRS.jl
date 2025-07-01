@@ -56,10 +56,11 @@
 
 function overload_GP_function(f_mean::Function, f_covariance::Function)
 
-    !method_exists(f_mean, (Coor,)) ?
+
+    !Base.hasmethod(f_mean, (Coor,)) ?
     error("The mean function of the GP must provide a method for arguments of type 'Coor'!") : nothing
 
-    !method_exists(f_covariance, (Coor,Coor)) ?
+    !Base.hasmethod(f_covariance, (Coor,Coor)) ?
     error("The covariance function of the GP must provide a method for both arguments of type 'Coor'!") : nothing
 
     ## ---------------------------------

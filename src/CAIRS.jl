@@ -15,7 +15,7 @@ module CAIRS
 
 ## using Distibutions
 using HCubature
-using Base.Dates
+using Dates
 
 import PDMats
 
