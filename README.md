@@ -9,6 +9,8 @@ Linux, OS X:
 [![Build status](https://ci.appveyor.com/api/projects/status/9cuvjuek83wut0ju/branch/master?svg=true)](https://ci.appveyor.com/project/scheidan/cairs-jl/branch/master)
 [![Coverage Status](https://img.shields.io/coveralls/scheidan/CAIRS.jl.svg)](https://coveralls.io/r/scheidan/CAIRS.jl?branch=master)
 
+**NOTE, this package is not maintained anymore. [This](https://github.com/scheidan/CAIRS.jl/pull/7) mostly AI generated PR updates CAIRS for Julia 1.9 or newer. Use it on your own risk.**
+
 _CAIRS_ is a framework to reconstruct rain fields by assimilating
 signals of fundamentally different rain sensors.
 
