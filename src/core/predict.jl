@@ -26,11 +26,11 @@
 ## Scaling: O(n) with number of prediction points
 ##          O(n^3) with n_calib and blocksize
 
-function sample_preditions{T<:Location}(loc_pred::Vector{T},
+function sample_preditions(loc_pred::Vector{T},
                                         R_dict_cal::Dict{Location, Vector{Float64}},
                                         n_samples::Int,
                                         prior_mean::Function, prior_cov::Function;
-                                        block_size::Int = 200)
+                                        block_size::Int = 200) where {T<:Location}
 
     ## separate locations that have already been used used for calibration
     loc_pred_cal = filter(x -> in(x, collect(keys(R_dict_cal))),  loc_pred)
@@ -90,12 +90,12 @@ end
 ##
 ## returns a dictionary
 
-function sample_preditions_block{T<:Location}(loc_pred::Vector{T},
+function sample_preditions_block(loc_pred::Vector{T},
                                               R_dict_cal::Dict{Location, Vector{Float64}},
                                               n_samples::Int,
                                               prior_mean::Function, prior_cov::Function,
                                               mu_c::Vector{Float64},
-                                              Sigma_cc::PDMats.AbstractPDMat)
+                                              Sigma_cc::PDMats.AbstractPDMat) where {T<:Location}
 
     loc_c = collect(keys(R_dict_cal))       # locations of calib
 
@@ -111,7 +111,7 @@ function sample_preditions_block{T<:Location}(loc_pred::Vector{T},
 
     ## Sigma_cond = Sigma_pp - Sigma_pc * inv(Sigma) * Sigma_pc'
     Sigma_cond = Sigma_pp - PDMats.X_invA_Xt(Sigma_cc, Sigma_pc)
-    Sigma_cond_chol = ctranspose(chol(Sigma_cond))
+    Sigma_cond_chol = cholesky(Sigma_cond).U
 
 
     ## number of sample in R_dict_cal
@@ -119,7 +119,7 @@ function sample_preditions_block{T<:Location}(loc_pred::Vector{T},
     n_pred = size(loc_pred, 1)
 
     ## Array to store the samples temporary
-    R_array_pred = Array{Float64}(n_samples, n_pred)
+    R_array_pred = Array{Float64}(undef, n_samples, n_pred)
 
     for i in 1:n_samples
 

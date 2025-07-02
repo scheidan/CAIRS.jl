@@ -6,6 +6,8 @@
 ## Andreas Scheidegger -- andreas.scheidegger@eawag.ch
 ## =======================================================
 
+using DelimitedFiles
+using Statistics
 
 ## ---------------------------------
 ## Write MCMC chains as csv file
@@ -19,12 +21,12 @@ function chains2csv(samples_dict::Dict{Location,Vector{Float64}}, filename="chai
     n_sample = size(samples_dict[loc1], 1)
 
     ## write Samp_dict as array
-    chains = Array{Float64}(n_sample, length(samples_dict))
+    chains = Array{Float64}(undef, n_sample, length(samples_dict))
     for i in 1:length(samples_dict)
         loc = collect(keys(samples_dict))[i]
         chains[:,i] = samples_dict[loc]
     end
-    writecsv(filename, chains)
+    writedlm(filename, chains, ',')
 end
 
 ## ---------------------------------
@@ -36,7 +38,7 @@ end
 function summary2csv(pred_dict::Dict, filename="predictions.csv", real::Bool=true)
 
     n_coor = mapreduce(x -> typeof(x)==Coor, +, keys(pred_dict))
-    predictions = Array{Float64}(n_coor, 7)
+    predictions = Array{Float64}(undef, n_coor, 7)
 
     for i in 1:n_coor
         coor = collect(keys(pred_dict))[i]
@@ -50,7 +52,7 @@ function summary2csv(pred_dict::Dict, filename="predictions.csv", real::Bool=tru
         end
     end
 
-    writecsv(filename, predictions)
+    writedlm(filename, predictions, ',')
 end
 
 
@@ -63,7 +65,7 @@ end
 
 function sensor2csv(signals::Vector, filename="sensors.csv")
 
-    positions = Array{Any}(0, 4)
+    positions = Array{Any}(undef, 0, 4)
 
     x = Float64[]
     y = Float64[]
@@ -108,5 +110,5 @@ function sensor2csv(signals::Vector, filename="sensors.csv")
     end
 
     ## write file
-    writecsv(filename, [x y time name])
+    writedlm(filename, [x y time name], ',')
 end

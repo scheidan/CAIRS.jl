@@ -21,10 +21,10 @@
 ## delta:          maximal time distance of signals to prediction location in Milli seconds
 
 
-function predict{T1<:Location, T2<:Signal}(loc_pred::Array{T1}, signals::Vector{T2},
+function predict(loc_pred::Array{T1}, signals::Vector{T2},
                                            prior_mean::Function, prior_cov::Function;
                                            n_sample_calib::Int = 20000, burn_in::Int = -1,
-                                           n_sample_pred::Int = 5000, delta = 5*60*1000)
+                                           n_sample_pred::Int = 5000, delta = 5*60*1000) where {T1<:Location, T2<:Signal}
 
     ## convert milliseconds
     if typeof(delta) <: Dates.Period

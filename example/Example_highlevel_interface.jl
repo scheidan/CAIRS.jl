@@ -8,7 +8,7 @@
 
 
 using CAIRS
-using Base.Dates
+using Dates
 using Distributions
 
 ## ---------------------------------
@@ -62,8 +62,9 @@ cov_GP = cov_exponential(sigma=10.0,           # standard deviation of GP
 sig = Signal[]                          # create an empty array
 
 ## path to example data
-path1 = joinpath(Pkg.dir("CAIRS"), "example", "data", "Sensor1.csv")
-path2 = joinpath(Pkg.dir("CAIRS"), "example", "data", "Sensor2.csv")
+root = dirname(dirname(pathof(CAIRS)))
+path1 = joinpath(root, "example", "data", "Sensor1.csv")
+path2 = joinpath(root, "example", "data", "Sensor2.csv")
 
 add_signal!(sig,                        # add signal to vector 'sig'
             path1,                      # file name
@@ -99,7 +100,7 @@ sensor2csv(sig, "sensor_coor.csv")
 ## create a simple grid (irregular predictions are possible too)
 nn = 20
 loc_pred = [Coor(i, j, time)
-            for i=linspace(0, 10, nn), j=linspace(0, 10, nn),
+            for i in range(0, stop=10, length=nn), j in range(0, stop=10, length=nn),
             time=DateTime(2013, 11, 22, 13, 15, 00) : Minute(1): DateTime(2013, 11, 22, 13, 20, 00) ]
 
 
@@ -129,7 +130,7 @@ summary2csv(R_pred, "rain_field.csv")
 ## the R-libraries 'lattice', 'latticeExtra' and 'tripack' must be
 ## installed.
 
-# pathRscript = joinpath(Pkg.dir("CAIRS"), "R", "compute_rain_map.r")
+# pathRscript = joinpath(root, "R", "compute_rain_map.r")
 # run(`Rscript $pathRscript  rain_field.csv sensor_coor.csv out.pdf`)
 
 ## here it is assumed that 'Rscript' is in PATH.
