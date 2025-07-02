@@ -7,7 +7,7 @@
 ## =======================================================
 
 using DelimitedFiles
-
+using Statistics
 
 ## ---------------------------------
 ## Write MCMC chains as csv file

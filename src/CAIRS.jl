@@ -6,7 +6,6 @@
 ## Andreas Scheidegger -- andreas.scheidegger@eawag.ch
 ## =======================================================
 
-__precompile__()
 
 ## ---------------------------------
 ## Core module with low-level interface
@@ -15,7 +14,8 @@ module CAIRS
 
 ## using Distibutions
 using HCubature
-using Base.Dates
+using Dates
+using LinearAlgebra
 
 import PDMats
 

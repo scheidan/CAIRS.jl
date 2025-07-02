@@ -56,10 +56,10 @@
 
 function overload_GP_function(f_mean::Function, f_covariance::Function)
 
-    !method_exists(f_mean, (Coor,)) ?
+    !hasmethod(f_mean, (Coor,)) ?
     error("The mean function of the GP must provide a method for arguments of type 'Coor'!") : nothing
 
-    !method_exists(f_covariance, (Coor,Coor)) ?
+    !hasmethod(f_covariance, (Coor,Coor)) ?
     error("The covariance function of the GP must provide a method for both arguments of type 'Coor'!") : nothing
 
     ## ---------------------------------
@@ -82,7 +82,7 @@ function overload_GP_function(f_mean::Function, f_covariance::Function)
                  d.position.time]
 
         ## construct function to integrate over
-        function f_int(v::Vector{Float64})
+        function f_int(v::AbstractVector)
             ## change the coordinates for integration
             kk = 1
             for i in 1:3
@@ -134,7 +134,7 @@ function overload_GP_function(f_mean::Function, f_covariance::Function)
 
 
         ## construct function to integrate over
-        function f_int(v::Vector{Float64})
+        function f_int(v::AbstractVector)
             ## change the coordiates for integration
             kk = 1
             for i in 1:6

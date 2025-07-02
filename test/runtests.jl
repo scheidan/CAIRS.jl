@@ -11,9 +11,9 @@ using CAIRS
 
 ## Run example script
 
-module examtest
+
 include(joinpath(dirname(dirname(pathof(CAIRS))), "example", "Example_highlevel_interface.jl"))
-end
+
 
 ## Coordinates
 
